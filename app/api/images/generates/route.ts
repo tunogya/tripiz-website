@@ -2,7 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 
 const QSTASH = `https://qstash.upstash.io/v1/publish/`;
 const DALL_E = "https://api.openai.com/v1/images/generations";
-const VERCEL_URL = "https://dalle-2-jade.vercel.app";
+const VERCEL_URL = "https://tripiz.abandon.ai";
 
 const POST = async (req: NextRequest) => {
   const { prompt } = await req.json();
