@@ -25,14 +25,12 @@ const POST = async (req: NextRequest) => {
     });
     const json = await response.json();
     return NextResponse.json({
-      success: true,
       id: json.messageId,
     }, {
       status: 202
     });
   } catch (error) {
     return NextResponse.json({
-      success: false,
       error: error,
       type: "Internal server error"
     }, {
