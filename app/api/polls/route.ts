@@ -19,4 +19,4 @@ const GET = async (req: NextRequest) => {
   }
 }
 
-export default GET
+export {GET}
