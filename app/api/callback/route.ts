@@ -2,10 +2,10 @@ import {NextRequest, NextResponse} from "next/server";
 import redis from "@/utils/redis";
 
 const POST = async (req: NextRequest) => {
-  const body = await req.json();
+  const data = await req.json();
   try {
-    const bodyString = JSON.stringify(body);
-    await redis.set(body.sourceMessageId, bodyString, {
+    const decoded = atob(data.body);
+    await redis.set(data.sourceMessageId, decoded, {
       ex: 60 * 60 * 24 * 30,
     });
     return NextResponse.json({

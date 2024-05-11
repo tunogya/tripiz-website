@@ -13,7 +13,7 @@ const GET = async (req: NextRequest) => {
   try {
     const data = await redis.get(id);
     if (!data) return NextResponse.json({ error: "No data found" }, { status: 404 });
-    else return NextResponse.json({ data }, { status: 200 });
+    else return NextResponse.json(data, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 });
   }
