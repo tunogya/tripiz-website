@@ -1,11 +1,11 @@
 import {NextRequest, NextResponse} from "next/server";
 import redis from "@/utils/redis";
 
-const GET = async (req: NextRequest) => {
+const POST = async (req: NextRequest) => {
   const body = await req.json();
   try {
-    const decoded = atob(body);
-    await redis.set(body.sourceMessageId, decoded, {
+    const bodyString = JSON.stringify(body);
+    await redis.set(body.sourceMessageId, bodyString, {
       ex: 60 * 60 * 24 * 30,
     });
     return NextResponse.json({
@@ -14,10 +14,10 @@ const GET = async (req: NextRequest) => {
       status: 200,
     });
   } catch (error) {
-    return NextResponse.json({error, success: false,}, {
+    return NextResponse.json({error: "Internal server error"}, {
       status: 500,
     });
   }
 }
 
-export {GET}
+export {POST}
