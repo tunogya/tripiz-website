@@ -13,7 +13,7 @@ const POST = async (req: NextRequest) => {
         "Upstash-Forward-Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
         "Content-Type": "application/json",
         "Upstash-Method": "POST",
-        "Upstash-Callback": `${VERCEL_URL}/api/callback`,
+        "Upstash-Callback": `${VERCEL_URL}/api/callback?token=${process.env.CALLBACK_TOKEN}`,
       },
       body: JSON.stringify({
         model,

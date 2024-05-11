@@ -2,6 +2,12 @@ import {NextRequest, NextResponse} from "next/server";
 import redis from "@/utils/redis";
 
 const POST = async (req: NextRequest) => {
+  const token = req.nextUrl.searchParams.get("token");
+  if (!token || token !== process.env.CALLBACK_TOKEN) return NextResponse.json({
+    error: "Invalid token"
+  }, {
+    status: 401
+  });
   const data = await req.json();
   try {
     const decoded = atob(data.body);
