@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from "next/server";
 
-const GET = async (req: NextRequest) => {
+const POST = async (req: NextRequest) => {
   return NextResponse.json({
     success: true
   }, {
@@ -8,4 +8,4 @@ const GET = async (req: NextRequest) => {
   });
 }
 
-export default GET
+export {POST}

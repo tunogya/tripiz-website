@@ -10,9 +10,10 @@ const POST = async (req: NextRequest) => {
     const response = await fetch(`${QSTASH + DALL_E}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.QSTASH_TOKEN}`,
-        "upstash-forward-Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Authorization": `Bearer ${process.env.QSTASH_TOKEN}`,
+        "Upstash-Forward-Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
         "Content-Type": "application/json",
+        "Upstash-Method": "POST",
         "Upstash-Callback": `${VERCEL_URL}/api/callback`,
       },
       body: JSON.stringify({
