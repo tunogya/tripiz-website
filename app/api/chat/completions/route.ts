@@ -1,13 +1,12 @@
 import {NextRequest, NextResponse} from "next/server";
 
-const QSTASH = `https://qstash.upstash.io/v1/publish/`;
 const CHAT_COMPLETION = "https://api.openai.com/v1/chat/completions";
 const VERCEL_URL = "https://tripiz.abandon.ai";
 
 const POST = async (req: NextRequest) => {
   const { messages, model, max_tokens, temperature } = await req.json();
   try {
-    const response = await fetch(`${QSTASH + CHAT_COMPLETION}`, {
+    const response = await fetch(`${process.env.QSTASH_URL + CHAT_COMPLETION}`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.QSTASH_TOKEN}`,
@@ -32,8 +31,7 @@ const POST = async (req: NextRequest) => {
     });
   } catch (error) {
     return NextResponse.json({
-      error: error,
-      type: "Internal server error"
+      error: "Internal server error",
     }, {
       status: 500
     });

@@ -1,13 +1,12 @@
 import {NextRequest, NextResponse} from "next/server";
 
-const QSTASH = `https://qstash.upstash.io/v1/publish/`;
 const DALL_E = "https://api.openai.com/v1/images/generations";
 const VERCEL_URL = "https://tripiz.abandon.ai";
 
 const POST = async (req: NextRequest) => {
   const { prompt } = await req.json();
   try {
-    const response = await fetch(`${QSTASH + DALL_E}`, {
+    const response = await fetch(`${process.env.QSTASH_URL + DALL_E}`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.QSTASH_TOKEN}`,
