@@ -10,7 +10,7 @@ const POST = async (req: NextRequest) => {
   });
   const data = await req.json();
   try {
-    const decoded = atob(data.body);
+    const decoded = Buffer.from(data.body, 'base64').toString('utf-8');
     await redis.set(data.sourceMessageId, decoded, {
       ex: 60 * 60 * 24 * 30,
     });
