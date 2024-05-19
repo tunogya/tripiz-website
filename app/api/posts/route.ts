@@ -1,5 +1,5 @@
+import mongodbClient from "@/utils/mongodb";
 import {NextRequest} from "next/server";
-import mongodbClient from "../../../utils/mongodb";
 
 const GET = async (req: NextRequest) => {
   return new Response("Hello, Next.js!")
@@ -16,6 +16,7 @@ const POST = async (req: NextRequest) => {
     createdAt: new Date(),
     updatedAt: new Date(),
   })
+  await mongodbClient.close();
   if (result.acknowledged) {
     return Response.json({
       id: result.insertedId.id,
@@ -23,8 +24,6 @@ const POST = async (req: NextRequest) => {
   } else {
     return Response.json({
       error: "Something went wrong",
-    }, {
-      status: 500
     })
   }
 }
