@@ -24,7 +24,7 @@ const GET = async (req: NextRequest) => {
 const POST = async (req: NextRequest) => {
   const { _id, parent_post_id, text, user, category, entities } = await req.json();
 
-  if (!text || !user || !category) {
+  if (!text || !user) {
     return Response.json({
       error: "Missing required fields: text, user, category",
     }, {
