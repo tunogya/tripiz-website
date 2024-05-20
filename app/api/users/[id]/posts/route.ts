@@ -6,7 +6,8 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
   const {db} = await connectToDatabase();
 
   let category: string | null = req.nextUrl.searchParams.get("category") || "";
-  let max_results: number = Number(req.nextUrl.searchParams.get("max_results") || 10);
+  const max_results: number = Number(req.nextUrl.searchParams.get("max_results") || 10);
+  const skip: number | undefined = Number(req.nextUrl.searchParams.get("max_results") || 0) || undefined;
 
   if (!["dreams", "memories", "reflections"].includes(category)) {
     category = null
@@ -20,6 +21,7 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
   }, {
     limit: max_results,
     sort: {updatedAt: -1},
+    skip: skip,
     projection: {
       $vector: 0
     }
