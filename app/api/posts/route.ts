@@ -26,7 +26,7 @@ const POST = async (req: NextRequest) => {
 
   if (!text || !user) {
     return Response.json({
-      error: "Missing required fields: text, user, category",
+      error: "Missing required fields: text, user",
     }, {
       status: 400
     })
