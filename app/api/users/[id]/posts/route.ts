@@ -25,11 +25,10 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
     }
   })
 
-  const [results, hasNext, next] = await Promise.all([
-    query.toArray(),
-    query.hasNext(),
-    query.next(),
-  ])
+  const results = await query.toArray();
+
+  const hasNext = results.length === max_results;
+  const next = hasNext ? results[results.length - 1]._id?.toString() : null;
 
   if (results) {
     return Response.json({
@@ -39,7 +38,7 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
       })),
       pagination: {
         hasNext,
-        next: next?._id?.toString()
+        next,
       },
     })
   } else {
