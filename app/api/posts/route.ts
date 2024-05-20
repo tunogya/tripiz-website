@@ -22,7 +22,7 @@ const GET = async (req: NextRequest) => {
 }
 
 const POST = async (req: NextRequest) => {
-  const { text, user, category } = await req.json();
+  const { _id, parent_post_id, text, user, category, entities } = await req.json();
 
   if (!text || !user || !category) {
     return Response.json({
@@ -43,12 +43,14 @@ const POST = async (req: NextRequest) => {
   const { db } = await connectToDatabase();
 
   const result = await db.collection<Post>("posts").insertOne({
-    _id: new ObjectId(),
-    text,
+    _id: _id ? new ObjectId(_id) : new ObjectId(),
+    parent_post_id: parent_post_id ? new ObjectId(parent_post_id) : undefined,
     user,
+    text,
     category,
     createdAt: new Date(),
     updatedAt: new Date(),
+    entities,
     $vector,
   })
   if (result.insertedId) {
