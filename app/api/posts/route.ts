@@ -2,6 +2,7 @@ import {NextRequest} from "next/server";
 import {connectToDatabase} from "@/utils/astradb";
 import {ObjectId} from "@datastax/astra-db-ts";
 import {Post} from "@/utils/type";
+import {embedding} from "@/utils/embedding";
 
 const GET = async (req: NextRequest) => {
   const ids = req.nextUrl.searchParams.get("ids")?.split(',').map((item) => new ObjectId(item)) || [];
@@ -23,6 +24,22 @@ const GET = async (req: NextRequest) => {
 const POST = async (req: NextRequest) => {
   const { text, user, category } = await req.json();
 
+  if (!text || !user || !category) {
+    return Response.json({
+      error: "Missing required fields: text, user, category",
+    }, {
+      status: 400
+    })
+  }
+
+  let $vector = []
+
+  try {
+    $vector = await embedding(text);
+  } catch (e) {
+    console.log(e);
+  }
+
   const { db } = await connectToDatabase();
 
   const result = await db.collection<Post>("posts").insertOne({
@@ -32,6 +49,7 @@ const POST = async (req: NextRequest) => {
     category,
     createdAt: new Date(),
     updatedAt: new Date(),
+    $vector,
   })
   if (result.insertedId) {
     return Response.json({

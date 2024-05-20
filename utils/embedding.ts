@@ -1,19 +1,23 @@
 export async function embedding(prompt: string) {
-  const response = await fetch("https://api.openai.com/v1/embeddings", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY || ""}`,
-    },
-    body: JSON.stringify({
-      input: prompt,
-      model: "text-embedding-3-small",
-    }),
-  });
+  try {
+    const response = await fetch("https://api.openai.com/v1/embeddings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY || ""}`,
+      },
+      body: JSON.stringify({
+        input: prompt,
+        model: "text-embedding-3-small",
+      }),
+    });
 
-  const result = await response.json();
+    const result = await response.json();
 
-  return result.data[0].embedding;
+    return result.data[0].embedding;
+  } catch (e) {
+    throw new Error("Failed to embed prompt");
+  }
 }
 
 /**
