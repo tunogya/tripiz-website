@@ -53,7 +53,6 @@ const POST = async (req: NextRequest) => {
     console.log(e);
   }
 
-  const encryptedMessage = encryptWithPublicKey(publicKey2Pem(publicKey), text);
 
   const { db } = await connectToDatabase();
 
@@ -61,11 +60,11 @@ const POST = async (req: NextRequest) => {
     _id: _id ? new ObjectId(_id) : new ObjectId(),
     parent_post_id: parent_post_id ? new ObjectId(parent_post_id) : undefined,
     user,
-    text: encryptedMessage,
+    text: encryptWithPublicKey(publicKey2Pem(publicKey), text),
     category: category || "reflection",
     createdAt: new Date(),
     updatedAt: new Date(),
-    entities,
+    entities: encryptWithPublicKey(publicKey2Pem(publicKey), JSON.stringify(entities)),
     $vector,
   })
   if (result.insertedId) {

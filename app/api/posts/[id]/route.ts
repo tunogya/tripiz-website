@@ -6,7 +6,7 @@ import {embedding} from "@/utils/embedding";
 import {encryptWithPublicKey, publicKey2Pem} from "@/utils/encrypt";
 
 const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
-  const id = params.id
+  const id = params.id;
   const { db } = await connectToDatabase();
 
   const result = await db.collection<Post>("posts").findOne({
@@ -46,7 +46,6 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
     console.log(e);
   }
 
-  const encryptedMessage = encryptWithPublicKey(publicKey2Pem(publicKey), text);
 
   const { db } = await connectToDatabase();
 
@@ -54,8 +53,8 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
     _id: new ObjectId(id)
   }, {
     $set: {
-      text: encryptedMessage,
-      entities,
+      text: encryptWithPublicKey(publicKey2Pem(publicKey), text),
+      entities: encryptWithPublicKey(publicKey2Pem(publicKey), JSON.stringify(entities)),
       $vector,
       updatedAt: new Date(),
     }

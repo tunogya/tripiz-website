@@ -6,16 +6,18 @@ export interface Post extends VectorDoc {
   user: string,
   text: string,
   category: string,
-  entities?: {
-    hashtags?: string[],
-    media?: {
-      id: string,
-      url: string,
-      media_url: string,
-      media_url_https: string,
-      type: string,
-    }[],
-  },
+  entities?: string,
   createdAt: Date,
   updatedAt: Date,
 }
+
+//   entities?: {
+//     hashtags?: string[],
+//     media?: {
+//       id: string,
+//       url: string,
+//       media_url: string,
+//       media_url_https: string,
+//       type: string,
+//     }[],
+//   },
