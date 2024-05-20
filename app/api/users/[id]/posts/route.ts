@@ -9,9 +9,9 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
   let max_results: number = Number(req.nextUrl.searchParams.get("max_results") || 10);
   const skip: number | undefined = Number(req.nextUrl.searchParams.get("skip") || 0);
 
-  if (!["dreams", "memories", "reflections"].includes(category)) {
+  if (!["dreams", "memories", "reflections", ""].includes(category)) {
     return Response.json({
-      error: "category should be one of dreams,memories,reflections",
+      error: "category should be one of dreams,memories,reflections, or null",
     }, {
       status: 400,
     })
