@@ -2,6 +2,7 @@ import {NextRequest} from "next/server";
 import {connectToDatabase} from "@/utils/astradb";
 import {ObjectId} from "@datastax/astra-db-ts";
 import {Post} from "@/utils/type";
+import {embedding} from "@/utils/embedding";
 
 const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id
@@ -19,6 +20,52 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
   return Response.json({
     data: result
   })
+}
+
+const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => {
+  const id = params.id
+  const { text, entities } = await req.json();
+
+  if (!text) {
+    return Response.json({
+      error: "Missing required fields: text",
+    }, {
+      status: 400
+    })
+  }
+
+  let $vector = []
+
+  try {
+    $vector = await embedding(text);
+  } catch (e) {
+    console.log(e);
+  }
+
+  const { db } = await connectToDatabase();
+
+  const result = await db.collection<Post>("posts").updateOne({
+    _id: new ObjectId(id)
+  }, {
+    $set: {
+      text,
+      entities,
+      $vector,
+      updatedAt: new Date(),
+    }
+  })
+
+  if (result.modifiedCount) {
+    return Response.json({
+      updated: true
+    })
+  } else {
+    return Response.json({
+      error: "Something went wrong",
+    }, {
+      status: 500,
+    })
+  }
 }
 
 const DELETE = async (req: NextRequest, { params }: { params: { id: string } }) => {
