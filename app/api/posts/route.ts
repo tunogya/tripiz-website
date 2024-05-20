@@ -21,7 +21,10 @@ const GET = async (req: NextRequest) => {
 
   if (results) {
     return Response.json({
-      data: results
+      data: results.map((item) => ({
+        ...item,
+        _id: item._id?.toString()
+      })),
     })
   } else {
     return Response.json({

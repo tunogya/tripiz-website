@@ -5,7 +5,11 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
   const id = params.id;
   const { db } = await connectToDatabase();
 
-  const category = req.nextUrl.searchParams.get("category");
+  let category: string | null = req.nextUrl.searchParams.get("category") || "";
+
+  if (!["dreams", "memories", "reflections"].includes(category)) {
+    category = null
+  }
 
   const results = await db.collection("posts").find({
     user: id,
@@ -22,7 +26,10 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
 
   if (results) {
     return Response.json({
-      data: results
+      data: results.map((item) => ({
+        ...item,
+        _id: item._id?.toString()
+      })),
     })
   } else {
     return Response.json({

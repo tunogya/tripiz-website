@@ -18,7 +18,10 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
     })
   }
   return Response.json({
-    data: result
+    data: {
+      ...result,
+      _id: result._id.toString(),
+    }
   })
 }
 
