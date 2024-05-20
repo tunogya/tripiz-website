@@ -1,14 +1,14 @@
 import {NextRequest} from "next/server";
-import {connectToDatabase} from "@/utils/mongodb";
+import {connectToDatabase} from "@/utils/astradb";
 
 const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id;
-  const { coreDb } = await connectToDatabase();
+  const { db } = await connectToDatabase();
 
   const category = req.nextUrl.searchParams.get("category");
 
-  const results = await coreDb.collection("posts").find({
-    author: id,
+  const results = await db.collection("posts").find({
+    user: id,
     ...(category && {
       category
     }),
