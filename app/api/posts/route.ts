@@ -6,6 +6,15 @@ import {embedding} from "@/utils/embedding";
 
 const GET = async (req: NextRequest) => {
   const ids = req.nextUrl.searchParams.get("ids")?.split(',').map((item) => new ObjectId(item)) || [];
+
+  if (ids.length === 0) {
+    return Response.json({
+      error: "Missing required fields: ids"
+    }, {
+      status: 400
+    })
+  }
+
   const { db } = await connectToDatabase();
 
   const results = await db.collection<Post>("posts").find({ _id: { $in: ids } }).toArray();
