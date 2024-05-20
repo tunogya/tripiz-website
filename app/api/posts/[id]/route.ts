@@ -1,18 +1,41 @@
-import mongodbClient from "@/utils/mongodb";
 import {NextRequest} from "next/server";
+import {connectToDatabase} from "@/utils/mongodb";
+import {ObjectId} from "mongodb";
 
 const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id
-  await mongodbClient.connect();
-  console.log(params.id)
-  // const { id } = req.query
+  const { coreDb } = await connectToDatabase();
 
-  await mongodbClient.close();
-  return Response.json({})
+  const result = await coreDb.collection("posts").findOne({
+    _id: new ObjectId(id)
+  })
+  if (!result) {
+    return Response.json({
+      error: "Something went wrong",
+    })
+  }
+  return Response.json({
+    data: result
+  })
 }
 
-const DELETE = async (req: NextRequest) => {
+const DELETE = async (req: NextRequest, { params }: { params: { id: string } }) => {
+  const id = params.id;
+  const { coreDb } = await connectToDatabase();
 
+  const result = await coreDb.collection("posts").deleteOne({
+    _id: new ObjectId(id)
+  })
+
+  if (!result.acknowledged) {
+    return Response.json({
+      error: "Something went wrong",
+    })
+  }
+
+  return Response.json({
+    deleted: true
+  })
 }
 
 export {
