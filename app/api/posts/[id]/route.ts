@@ -10,6 +10,10 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
 
   const result = await db.collection<Post>("posts").findOne({
     _id: new ObjectId(id),
+  }, {
+    projection: {
+      $vector: 0,
+    }
   })
 
   if (!result) {
