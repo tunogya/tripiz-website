@@ -6,7 +6,7 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
   const {db} = await connectToDatabase();
 
   let category: string | null = req.nextUrl.searchParams.get("category") || "";
-  let max_results: number = Number(req.nextUrl.searchParams.get("category") || 10);
+  let max_results: number = Number(req.nextUrl.searchParams.get("max_results") || 10);
 
   if (!["dreams", "memories", "reflections"].includes(category)) {
     category = null
@@ -37,8 +37,10 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
         ...item,
         _id: item._id?.toString()
       })),
-      hasNext,
-      next: next?._id?.toString()
+      pagination: {
+        hasNext,
+        next: next?._id?.toString()
+      },
     })
   } else {
     return Response.json({
