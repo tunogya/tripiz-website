@@ -20,7 +20,7 @@ const GET = async (req: NextRequest) => {
 }
 
 const POST = async (req: NextRequest) => {
-  const { title, content, author } = await req.json();
+  const { title, content, author, category } = await req.json();
 
   const { coreDb } = await connectToDatabase();
 
@@ -28,6 +28,7 @@ const POST = async (req: NextRequest) => {
     title,
     content,
     author,
+    category,
     createdAt: new Date(),
     updatedAt: new Date(),
   })
