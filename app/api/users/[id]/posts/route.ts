@@ -15,6 +15,9 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
   }, {
     limit: 10,
     sort: {updatedAt: -1},
+    projection: {
+      $vector: 0
+    }
   }).toArray();
 
   if (results) {
