@@ -7,7 +7,7 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
 
   let category: string | null = req.nextUrl.searchParams.get("category") || "";
   const max_results: number = Number(req.nextUrl.searchParams.get("max_results") || 10);
-  const skip: number | undefined = Number(req.nextUrl.searchParams.get("max_results") || 0) || undefined;
+  const skip: number | undefined = Number(req.nextUrl.searchParams.get("skip") || 0);
 
   if (!["dreams", "memories", "reflections"].includes(category)) {
     category = null
@@ -30,7 +30,6 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
   const results = await query.toArray();
 
   const hasNext = results.length === max_results;
-  const next = hasNext ? results[results.length - 1]._id?.toString() : null;
 
   if (results) {
     return Response.json({
@@ -40,7 +39,7 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
       })),
       pagination: {
         hasNext,
-        next,
+        nextSkip: hasNext ? skip + results.length : null,
       },
     })
   } else {
