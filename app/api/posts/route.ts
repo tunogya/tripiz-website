@@ -47,7 +47,7 @@ const POST = async (req: NextRequest) => {
     parent_post_id: parent_post_id ? new ObjectId(parent_post_id) : undefined,
     user,
     text,
-    category,
+    category: category || "reflection",
     createdAt: new Date(),
     updatedAt: new Date(),
     entities,
