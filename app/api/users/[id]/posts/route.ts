@@ -14,7 +14,7 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
     }),
   }, {
     limit: 10,
-    sort: {createdAt: -1},
+    sort: {updatedAt: -1},
   }).toArray();
 
   if (results) {
