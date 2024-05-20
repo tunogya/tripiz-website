@@ -3,6 +3,7 @@ import {connectToDatabase} from "@/utils/astradb";
 import {ObjectId} from "@datastax/astra-db-ts";
 import {Post} from "@/utils/type";
 import {embedding} from "@/utils/embedding";
+import {encryptWithPublicKey, publicKey2Pem} from "@/utils/encrypt";
 
 const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id
@@ -27,7 +28,7 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
 
 const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id
-  const { text, entities } = await req.json();
+  const { text, entities, publicKey } = await req.json();
 
   if (!text) {
     return Response.json({
@@ -45,13 +46,15 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
     console.log(e);
   }
 
+  const encryptedMessage = encryptWithPublicKey(publicKey2Pem(publicKey), text);
+
   const { db } = await connectToDatabase();
 
   const result = await db.collection<Post>("posts").updateOne({
     _id: new ObjectId(id)
   }, {
     $set: {
-      text,
+      text: encryptedMessage,
       entities,
       $vector,
       updatedAt: new Date(),

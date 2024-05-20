@@ -3,6 +3,7 @@ import {connectToDatabase} from "@/utils/astradb";
 import {ObjectId} from "@datastax/astra-db-ts";
 import {Post} from "@/utils/type";
 import {embedding} from "@/utils/embedding";
+import {encryptWithPublicKey, publicKey2Pem} from "@/utils/encrypt";
 
 const GET = async (req: NextRequest) => {
   const ids = req.nextUrl.searchParams.get("ids")?.split(',').map((item) => new ObjectId(item)) || [];
@@ -34,11 +35,11 @@ const GET = async (req: NextRequest) => {
 }
 
 const POST = async (req: NextRequest) => {
-  const { _id, parent_post_id, text, user, category, entities } = await req.json();
+  const { _id, parent_post_id, text, user, category, entities, publicKey } = await req.json();
 
-  if (!text || !user) {
+  if (!text || !user || !publicKey) {
     return Response.json({
-      error: "Missing required fields: text, user",
+      error: "Missing required fields: text, user, publicKey",
     }, {
       status: 400
     })
@@ -52,13 +53,15 @@ const POST = async (req: NextRequest) => {
     console.log(e);
   }
 
+  const encryptedMessage = encryptWithPublicKey(publicKey2Pem(publicKey), text);
+
   const { db } = await connectToDatabase();
 
   const result = await db.collection<Post>("posts").insertOne({
     _id: _id ? new ObjectId(_id) : new ObjectId(),
     parent_post_id: parent_post_id ? new ObjectId(parent_post_id) : undefined,
     user,
-    text,
+    text: encryptedMessage,
     category: category || "reflection",
     createdAt: new Date(),
     updatedAt: new Date(),
