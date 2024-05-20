@@ -6,11 +6,23 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
   const {db} = await connectToDatabase();
 
   let category: string | null = req.nextUrl.searchParams.get("category") || "";
-  const max_results: number = Number(req.nextUrl.searchParams.get("max_results") || 10);
+  let max_results: number = Number(req.nextUrl.searchParams.get("max_results") || 10);
   const skip: number | undefined = Number(req.nextUrl.searchParams.get("skip") || 0);
 
   if (!["dreams", "memories", "reflections"].includes(category)) {
-    category = null
+    return Response.json({
+      error: "category should be one of dreams,memories,reflections",
+    }, {
+      status: 400,
+    })
+  }
+
+  if (max_results >= 100 || max_results <= 0) {
+    return Response.json({
+      error: "max_results should > 0 and <= 100",
+    }, {
+      status: 400,
+    })
   }
 
   const query = db.collection("posts").find({
