@@ -89,5 +89,6 @@ const DELETE = async (req: NextRequest, { params }: { params: { id: string } }) 
 
 export {
   GET,
+  PUT,
   DELETE
 }
