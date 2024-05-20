@@ -1,14 +1,16 @@
 import {NextRequest} from "next/server";
-import {connectToDatabase} from "@/utils/mongodb";
-import {ObjectId} from "mongodb";
+import {connectToDatabase} from "@/utils/astradb";
+import {ObjectId} from "@datastax/astra-db-ts";
+import {Post} from "@/utils/type";
 
 const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id
-  const { coreDb } = await connectToDatabase();
+  const { db } = await connectToDatabase();
 
-  const result = await coreDb.collection("posts").findOne({
-    _id: new ObjectId(id)
+  const result = await db.collection<Post>("posts").findOne({
+    _id: new ObjectId(id),
   })
+
   if (!result) {
     return Response.json({
       error: "Something went wrong",
@@ -21,13 +23,13 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
 
 const DELETE = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id;
-  const { coreDb } = await connectToDatabase();
+  const { db } = await connectToDatabase();
 
-  const result = await coreDb.collection("posts").deleteOne({
+  const result = await db.collection<Post>("posts").deleteOne({
     _id: new ObjectId(id)
   })
 
-  if (!result.acknowledged) {
+  if (!result.deletedCount) {
     return Response.json({
       error: "Something went wrong",
     })

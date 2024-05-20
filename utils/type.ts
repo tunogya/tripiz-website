@@ -1,0 +1,20 @@
+import {ObjectId, UUID, VectorDoc} from "@datastax/astra-db-ts";
+
+export interface Post extends VectorDoc {
+  _id: ObjectId,
+  user: string,
+  text: string,
+  category: string,
+  entities?: {
+    hashtags?: string[],
+    media?: {
+      id: string,
+      url: string,
+      media_url: string,
+      media_url_https: string,
+      type: string,
+    }[],
+  },
+  createdAt: Date,
+  updatedAt: Date,
+}
