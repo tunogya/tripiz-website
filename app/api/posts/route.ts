@@ -3,7 +3,6 @@ import {connectToDatabase} from "@/utils/astradb";
 import {ObjectId} from "@datastax/astra-db-ts";
 import {Post} from "@/utils/type";
 import {embedding} from "@/utils/embedding";
-import {encryptWithPublicKey, publicKey2Pem} from "@/utils/encrypt";
 
 const GET = async (req: NextRequest) => {
   const ids = req.nextUrl.searchParams.get("ids")?.split(',').map((item) => new ObjectId(item)) || [];
@@ -35,11 +34,11 @@ const GET = async (req: NextRequest) => {
 }
 
 const POST = async (req: NextRequest) => {
-  const { _id, parent_post_id, text, user, category, entities, publicKey } = await req.json();
+  const { _id, parent_post_id, text, user, category, entities } = await req.json();
 
-  if (!text || !user || !publicKey) {
+  if (!text || !user) {
     return Response.json({
-      error: "Missing required fields: text, user, publicKey",
+      error: "Missing required fields: text, user",
     }, {
       status: 400
     })
@@ -60,11 +59,11 @@ const POST = async (req: NextRequest) => {
     _id: _id ? new ObjectId(_id) : new ObjectId(),
     parent_post_id: parent_post_id ? new ObjectId(parent_post_id) : undefined,
     user,
-    text: encryptWithPublicKey(publicKey2Pem(publicKey), text),
+    text,
     category: category || "reflection",
     createdAt: new Date(),
     updatedAt: new Date(),
-    entities: encryptWithPublicKey(publicKey2Pem(publicKey), JSON.stringify(entities)),
+    entities,
     $vector,
   })
   if (result.insertedId) {
