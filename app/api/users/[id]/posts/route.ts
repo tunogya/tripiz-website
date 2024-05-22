@@ -27,7 +27,6 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
 
   const query = db.collection("posts").find({
     user: id,
-    parent_post_id: null,
     ...(category && {
       category
     }),
