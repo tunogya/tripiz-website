@@ -7,7 +7,7 @@ const GET = async (req: NextRequest) => {
   const user = req.headers.get("Tripiz-User");
   const signature = req.headers.get("Tripiz-Signature");
 
-  if (!user) {
+  if (!user || !signature) {
     return Response.json({
       error: "Missing required fields: Tripiz-User, Tripiz-Signature"
     }, {
