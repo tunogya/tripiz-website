@@ -2,7 +2,7 @@ import {NextRequest} from "next/server";
 import {connectToDatabase} from "@/utils/astradb";
 import {ObjectId} from "@datastax/astra-db-ts";
 import {Post} from "@/utils/type";
-// import {embedding} from "@/utils/embedding";
+import {embedding} from "@/utils/embedding";
 
 const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id;
@@ -41,13 +41,16 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
     })
   }
 
-  // let $vector = []
-  //
-  // try {
-  //   $vector = await embedding(text);
-  // } catch (e) {
-  //   console.log(e);
-  // }
+  let $vector = []
+
+  try {
+    $vector = await embedding(JSON.stringify({
+      text,
+      entities,
+    }));
+  } catch (e) {
+    console.log(e);
+  }
 
   const { db } = await connectToDatabase();
 
@@ -57,7 +60,7 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
     $set: {
       text,
       entities,
-      // $vector,
+      $vector,
       updatedAt: new Date(),
     }
   })
