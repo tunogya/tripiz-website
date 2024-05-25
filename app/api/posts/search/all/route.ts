@@ -4,6 +4,7 @@ import {embedding} from "@/utils/embedding";
 
 const GET = async (req: NextRequest) => {
   const query = req.nextUrl.searchParams.get("query");
+  const max_results: number = Number(req.nextUrl.searchParams.get("max_results") || 10);
   const user = req.headers.get("Tripiz-User");
   const signature = req.headers.get("Tripiz-Signature");
 
@@ -30,7 +31,7 @@ const GET = async (req: NextRequest) => {
       },
       {
         vector: await embedding(query),
-        limit: 10,
+        limit: max_results,
         projection: { $vector: 0 },
       }
     )
