@@ -44,14 +44,13 @@ const POST = async (req: NextRequest) => {
     })
   }
 
-  let $vector = []
+  // let $vector = []
 
-  try {
-    $vector = await embedding(text);
-  } catch (e) {
-    console.log(e);
-  }
-
+  // try {
+  //   $vector = await embedding(text);
+  // } catch (e) {
+  //   console.log(e);
+  // }
 
   const { db } = await connectToDatabase();
 
@@ -64,7 +63,7 @@ const POST = async (req: NextRequest) => {
     createdAt: new Date(),
     updatedAt: new Date(),
     entities,
-    $vector,
+    // $vector,
   })
   if (result.insertedId) {
     return Response.json({
