@@ -2,7 +2,7 @@ import {NextRequest} from "next/server";
 import {connectToDatabase} from "@/utils/astradb";
 import {ObjectId} from "@datastax/astra-db-ts";
 import {Post} from "@/utils/type";
-import {embedding} from "@/utils/embedding";
+// import {embedding} from "@/utils/embedding";
 
 const GET = async (req: NextRequest) => {
   const ids = req.nextUrl.searchParams.get("ids")?.split(',').map((item) => new ObjectId(item)) || [];
