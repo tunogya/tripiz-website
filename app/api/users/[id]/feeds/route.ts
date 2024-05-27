@@ -16,7 +16,7 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
     })
   }
 
-  const query = db.collection("choices").find({
+  const query = db.collection("feeds").find({
     user: id,
   }, {
     limit: max_results,
