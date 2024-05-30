@@ -25,6 +25,7 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
     data: {
       ...result,
       _id: result._id.toString(),
+      entities: result.entities?.ai ? {} : result.entities,
     }
   })
 }
