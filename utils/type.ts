@@ -7,15 +7,7 @@ export interface Post extends VectorDoc {
   text: string,
   category: string,
   entities: {
-    media?: {
-      id: string,
-      url: string,
-      media_url: string,
-      media_url_https: string,
-      type: string,
-    }[],
-  },
-  ai_entities?: {
+    ai?: boolean,
     media?: {
       id: string,
       url: string,
