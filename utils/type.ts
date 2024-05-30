@@ -15,6 +15,15 @@ export interface Post extends VectorDoc {
       type: string,
     }[],
   },
+  ai_entities?: {
+    media?: {
+      id: string,
+      url: string,
+      media_url: string,
+      media_url_https: string,
+      type: string,
+    }[],
+  },
   createdAt: Date,
   updatedAt: Date,
 }

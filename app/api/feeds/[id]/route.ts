@@ -2,34 +2,12 @@ import {NextRequest} from "next/server";
 import {connectToDatabase} from "@/utils/astradb";
 import {ObjectId} from "@datastax/astra-db-ts";
 import {Post} from "@/utils/type";
-import {embedding} from "@/utils/embedding";
-
-const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
-  const id = params.id;
-  const { db } = await connectToDatabase();
-
-  const result = await db.collection<Post>("feeds").findOne({
-    _id: new ObjectId(id),
-  })
-
-  if (!result) {
-    return Response.json({
-      error: "Something went wrong",
-    })
-  }
-  return Response.json({
-    data: {
-      ...result,
-      _id: result._id.toString(),
-    }
-  })
-}
 
 const POST = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id;
   const { db } = await connectToDatabase();
 
-  const feed = await db.collection<Post>("feeds").findOne({
+  const feed = await db.collection<Post>("posts").findOne({
     _id: new ObjectId(id),
   })
 
@@ -39,23 +17,12 @@ const POST = async (req: NextRequest, { params }: { params: { id: string } }) =>
     })
   }
 
-  let $vector = []
-
-  try {
-    $vector = await embedding(JSON.stringify({
-      text: feed.text,
-      entities: feed.entities,
-    }));
-  } catch (e) {
-    console.log(e);
-  }
-
   const updatePost = await db.collection<Post>("posts").updateOne({
     _id: new ObjectId(id)
   }, {
     $set: {
-      entities: feed.entities,
-      $vector,
+      entities: feed.ai_entities,
+      ai_entities: {},
       updatedAt: new Date(),
     }
   })
@@ -77,11 +44,18 @@ const DELETE = async (req: NextRequest, { params }: { params: { id: string } }) 
   const id = params.id;
   const { db } = await connectToDatabase();
 
-  const result = await db.collection<Post>("feeds").deleteOne({
+  const result = await db.collection<Post>("posts").updateOne({
     _id: new ObjectId(id)
+  }, {
+    $set: {
+      updatedAt: new Date(),
+    },
+    $unset: {
+      ai_entities: "",
+    }
   })
 
-  if (!result.deletedCount) {
+  if (!result.modifiedCount) {
     return Response.json({
       error: "Something went wrong",
     })
@@ -93,7 +67,6 @@ const DELETE = async (req: NextRequest, { params }: { params: { id: string } }) 
 }
 
 export {
-  GET,
   POST,
   DELETE
 }

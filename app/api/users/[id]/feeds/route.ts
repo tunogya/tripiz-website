@@ -16,8 +16,11 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
     })
   }
 
-  const query = db.collection("feeds").find({
+  const query = db.collection("posts").find({
     user: id,
+    ai_entities: {
+      $exists: false,
+    },
   }, {
     limit: max_results,
     sort: {updatedAt: -1},
