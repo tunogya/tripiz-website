@@ -5,6 +5,7 @@ export interface Post extends VectorDoc {
   parent_post_id?: ObjectId,
   user: string,
   text: string,
+  flagged?: boolean,
   category: string,
   entities: {
     ai?: boolean,

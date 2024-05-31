@@ -3,6 +3,7 @@ import {connectToDatabase} from "@/utils/astradb";
 import {ObjectId} from "@datastax/astra-db-ts";
 import {Post} from "@/utils/type";
 import {embedding} from "@/utils/embedding";
+import openai from "@/utils/openai";
 
 const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id;
@@ -42,15 +43,22 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
     })
   }
 
-  let $vector = []
+  let $vector: number[] = [], flagged = false;
 
   try {
-    $vector = await embedding(JSON.stringify({
-      text,
-      entities,
-    }));
+    const [vector, moderation] = await Promise.all([
+      embedding(JSON.stringify({
+        text,
+        entities,
+      })),
+      openai.moderations.create({
+        input: text,
+      })
+    ])
+    $vector = vector;
+    flagged = moderation.results[0].flagged;
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
 
   const { db } = await connectToDatabase();
@@ -61,6 +69,7 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
     $set: {
       text,
       entities,
+      flagged,
       $vector,
       updatedAt: new Date(),
     }

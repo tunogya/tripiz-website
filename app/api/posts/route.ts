@@ -3,6 +3,7 @@ import {connectToDatabase} from "@/utils/astradb";
 import {ObjectId} from "@datastax/astra-db-ts";
 import {Post} from "@/utils/type";
 import {embedding} from "@/utils/embedding";
+import openai from "@/utils/openai";
 
 const GET = async (req: NextRequest) => {
   const ids = req.nextUrl.searchParams.get("ids")?.split(',').map((item) => new ObjectId(item)) || [];
@@ -15,9 +16,9 @@ const GET = async (req: NextRequest) => {
     })
   }
 
-  const { db } = await connectToDatabase();
+  const {db} = await connectToDatabase();
 
-  const results = await db.collection<Post>("posts").find({ _id: { $in: ids } }).toArray();
+  const results = await db.collection<Post>("posts").find({_id: {$in: ids}}).toArray();
 
   if (results) {
     return Response.json({
@@ -34,7 +35,7 @@ const GET = async (req: NextRequest) => {
 }
 
 const POST = async (req: NextRequest) => {
-  const { _id, parent_post_id, text, user, category, entities } = await req.json();
+  const {_id, parent_post_id, text, user, category, entities} = await req.json();
 
   if (!text || !user) {
     return Response.json({
@@ -44,24 +45,32 @@ const POST = async (req: NextRequest) => {
     })
   }
 
-  let $vector = []
+  let $vector: number[] = [], flagged = false;
 
   try {
-    $vector = await embedding(JSON.stringify({
-      text,
-      entities,
-    }));
+    const [vector, moderation] = await Promise.all([
+      embedding(JSON.stringify({
+        text,
+        entities,
+      })),
+      openai.moderations.create({
+        input: text,
+      })
+    ])
+    $vector = vector;
+    flagged = moderation.results[0].flagged;
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
 
-  const { db } = await connectToDatabase();
+  const {db} = await connectToDatabase();
 
   const result = await db.collection<Post>("posts").insertOne({
     _id: _id ? new ObjectId(_id) : new ObjectId(),
     parent_post_id: parent_post_id ? new ObjectId(parent_post_id) : undefined,
     user,
     text,
+    flagged,
     category: category || "reflection",
     createdAt: new Date(),
     updatedAt: new Date(),
