@@ -21,7 +21,7 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
     "entities.ai": true,
   }, {
     limit: max_results,
-    sort: {updatedAt: -1},
+    sort: {createdAt: -1},
     skip: skip,
     projection: {
       $vector: 0
