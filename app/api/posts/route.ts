@@ -35,7 +35,7 @@ const GET = async (req: NextRequest) => {
 }
 
 const POST = async (req: NextRequest) => {
-  const {_id, parent_post_id, text, user, category, entities, signature} = await req.json();
+  const {_id, parent_post_id, text, user, category, signature} = await req.json();
 
   if (!text || !user) {
     return Response.json({
@@ -71,7 +71,6 @@ const POST = async (req: NextRequest) => {
     category: category || "reflection",
     createdAt: new Date(),
     updatedAt: new Date(),
-    entities,
     signature,
     $vector,
   })

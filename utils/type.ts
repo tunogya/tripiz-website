@@ -8,16 +8,6 @@ export interface Post extends VectorDoc {
   flagged?: boolean,
   category: string,
   signature?: string,
-  entities: {
-    ai?: boolean,
-    media?: {
-      id: string,
-      url: string,
-      media_url: string,
-      media_url_https: string,
-      type: string,
-    }[],
-  },
   createdAt: Date,
   updatedAt: Date,
 }

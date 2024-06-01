@@ -26,14 +26,13 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
     data: {
       ...result,
       _id: result._id.toString(),
-      entities: result.entities?.ai ? {} : result.entities,
     }
   })
 }
 
 const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id
-  const { text, entities, signature } = await req.json();
+  const { text, signature } = await req.json();
 
   if (!text) {
     return Response.json({
@@ -65,7 +64,6 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
   }, {
     $set: {
       text,
-      entities,
       flagged,
       signature,
       $vector,
