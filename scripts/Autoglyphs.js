@@ -69,7 +69,6 @@ function draw(seed) {
   return output;
 }
 
-// Example usage:
-const seed = 0x123456722372823232932732882983273237283627832n; // Replace with any seed value
+const seed = "0x123456722372823232932732882983273237283627832n"; // Replace with any seed value
 const result = draw(seed);
 console.log(result);

@@ -37,7 +37,7 @@ function getScheme(a: number) {
   return 10;
 }
 
-function draw(seed: number) {
+function draw(seed: string) {
   const a = BigInt('0x' + crypto.createHash('sha256').update(seed.toString()).digest('hex'));
   let output = PREFIX;
 
@@ -47,8 +47,10 @@ function draw(seed: number) {
 
   for (let i = 0; i < SIZE; i++) {
     let y = 2 * (i - HALF_SIZE) + 1;
+    // @ts-ignore
     if (a % 3n === 1n) {
       y = -y;
+      // @ts-ignore
     } else if (a % 3n === 2n) {
       y = abs(y);
     }
@@ -56,11 +58,12 @@ function draw(seed: number) {
 
     for (let j = 0; j < SIZE; j++) {
       let x = 2 * (j - HALF_SIZE) + 1;
+      // @ts-ignore
       if (a % 2n === 1n) {
         x = abs(x);
       }
       x = x * Number(a);
-
+      // @ts-ignore
       const v = Math.abs(x * y / Number(2n**32n)) % mod;
       output += symbols[v];
     }
@@ -71,8 +74,8 @@ function draw(seed: number) {
 }
 
 const GET = async (req: NextRequest) => {
-  const hash = req.nextUrl.searchParams.get("hash");
-  const result = draw(Number(hash));
+  const seed = req.nextUrl.searchParams.get("seed") || "";
+  const result = draw(seed);
 
   let svgContent = `<svg width="1024" height="1024"
      xmlns="http://www.w3.org/2000/svg"
@@ -92,7 +95,7 @@ const GET = async (req: NextRequest) => {
 
   const lines = result.split('\n')
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < lines.length; i++) {
     const line = lines[i]
     const y = 128 + 12 * i
     svgContent += `<text x="512" y="${y}" style="font-family:autoglyphs-400; font-size:12px; text-anchor:middle; dominant-baseline:middle" >${line}</text>`
