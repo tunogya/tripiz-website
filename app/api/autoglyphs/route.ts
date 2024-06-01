@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import * as crypto from "crypto";
 import opentype from "opentype.js";
+import path from 'path';
 
 const SIZE = 64;
 const HALF_SIZE = SIZE / 2;
@@ -99,8 +100,8 @@ const GET = async (req: NextRequest) => {
 
   const result = draw(seed, hash);
 
-  const fontUrl = './public/fonts/autoglyphs-font/autoglyphs-400.ttf';
-  const font = await opentype.load(fontUrl);
+  const fontPath = path.join(process.cwd(), 'public', 'fonts', 'autoglyphs-font', 'autoglyphs-400.ttf');
+  const font = await opentype.load(fontPath);
 
   let svgContent = `<svg width="1024" height="1024"
      xmlns="http://www.w3.org/2000/svg"
