@@ -116,7 +116,7 @@ const GET = async (req: NextRequest) => {
     let x = 128;
     for (const char of line) {
       const glyph = font.charToGlyph(char);
-      const pathData = glyph.getPath(x, y, 12).toPathData(3);
+      const pathData = glyph.getPath(x, y, 12).toPathData(1);
       svgContent += `<path d="${pathData}" fill="black" />`;
       x += (glyph.advanceWidth || 0) * (12 / font.unitsPerEm);
     }
