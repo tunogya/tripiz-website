@@ -37,8 +37,21 @@ function getScheme(a: number) {
   return 10;
 }
 
-function draw(seed: string) {
-  const a = BigInt('0x' + crypto.createHash('sha256').update(seed.toString()).digest('hex'));
+function draw(seed?: string, hash?: string) {
+  let a;
+  if (hash) {
+    const regex = /^0x[0-9a-fA-F]+$/;
+    if (regex.test(hash)) {
+      a = BigInt(hash)
+    } else {
+     return ""
+    }
+  } else if (seed) {
+    a = BigInt('0x' + crypto.createHash('sha256').update(seed.toString()).digest('hex'));
+  } else {
+    return ""
+  }
+
   let output = PREFIX;
 
   const schemeIndex = getScheme(Number(a));
@@ -74,8 +87,16 @@ function draw(seed: string) {
 }
 
 const GET = async (req: NextRequest) => {
-  const seed = req.nextUrl.searchParams.get("seed") || "";
-  const result = draw(seed);
+  const seed = req.nextUrl.searchParams.get("seed") || undefined;
+  const hash = req.nextUrl.searchParams.get("hash") || undefined;
+
+  if (!seed && !hash) {
+    return new Response("Need hash or seed", {
+      status: 400,
+    })
+  }
+
+  const result = draw(seed, hash);
 
   let svgContent = `<svg width="1024" height="1024"
      xmlns="http://www.w3.org/2000/svg"
