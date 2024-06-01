@@ -33,7 +33,7 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
 
 const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id
-  const { text, entities } = await req.json();
+  const { text, entities, signature } = await req.json();
 
   if (!text) {
     return Response.json({
@@ -47,10 +47,7 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
 
   try {
     const [vector, moderation] = await Promise.all([
-      embedding(JSON.stringify({
-        text,
-        entities,
-      })),
+      embedding(text),
       openai.moderations.create({
         input: text,
       })
@@ -70,6 +67,7 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
       text,
       entities,
       flagged,
+      signature,
       $vector,
       updatedAt: new Date(),
     }

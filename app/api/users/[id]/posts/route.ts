@@ -30,6 +30,9 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
     ...(category && {
       category
     }),
+    parent_post_id: {
+      $exists: false,
+    },
   }, {
     limit: max_results,
     sort: {createdAt: -1},

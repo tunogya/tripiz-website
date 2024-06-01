@@ -35,7 +35,7 @@ const GET = async (req: NextRequest) => {
 }
 
 const POST = async (req: NextRequest) => {
-  const {_id, parent_post_id, text, user, category, entities} = await req.json();
+  const {_id, parent_post_id, text, user, category, entities, signature} = await req.json();
 
   if (!text || !user) {
     return Response.json({
@@ -49,10 +49,7 @@ const POST = async (req: NextRequest) => {
 
   try {
     const [vector, moderation] = await Promise.all([
-      embedding(JSON.stringify({
-        text,
-        entities,
-      })),
+      embedding(text),
       openai.moderations.create({
         input: text,
       })
@@ -75,6 +72,7 @@ const POST = async (req: NextRequest) => {
     createdAt: new Date(),
     updatedAt: new Date(),
     entities,
+    signature,
     $vector,
   })
   if (result.insertedId) {

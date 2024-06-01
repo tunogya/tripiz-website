@@ -7,6 +7,7 @@ export interface Post extends VectorDoc {
   text: string,
   flagged?: boolean,
   category: string,
+  signature?: string,
   entities: {
     ai?: boolean,
     media?: {
