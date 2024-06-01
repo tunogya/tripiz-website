@@ -1,5 +1,6 @@
-import {NextRequest} from "next/server";
+import { NextRequest } from "next/server";
 import * as crypto from "crypto";
+import opentype from "opentype.js";
 
 const SIZE = 64;
 const HALF_SIZE = SIZE / 2;
@@ -44,7 +45,7 @@ function draw(seed?: string, hash?: string) {
     if (regex.test(hash)) {
       a = BigInt(hash)
     } else {
-     return ""
+      return ""
     }
   } else if (seed) {
     a = BigInt('0x' + crypto.createHash('sha256').update(seed.toString()).digest('hex'));
@@ -80,7 +81,7 @@ function draw(seed?: string, hash?: string) {
       const v = Math.abs(x * y / Number(2n**32n)) % mod;
       output += symbols[v];
     }
-    output += '\n'; // Adding newline character in URL encoding
+    output += '\n';
   }
 
   return output;
@@ -98,37 +99,36 @@ const GET = async (req: NextRequest) => {
 
   const result = draw(seed, hash);
 
+  const fontUrl = './public/fonts/autoglyphs-font/autoglyphs-400.ttf';
+  const font = await opentype.load(fontUrl);
+
   let svgContent = `<svg width="1024" height="1024"
      xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink">
-<rect x="0" y="0" width="1024" height="1024" style="fill:white" />
-<defs>
-<style type="text/css">
-<![CDATA[
+<rect x="0" y="0" width="1024" height="1024" style="fill:white" />`;
 
-\t\t@font-face {
-\t\t\tfont-family: 'autoglyphs-400';
-\t\t\tsrc: url('https://tripiz.abandon.ai/fonts/autoglyphs-font/autoglyphs-400.ttf');
-\t\t}
-]]>
-</style>
-</defs>`
-
-  const lines = result.split('\n')
+  const lines = result.split('\n');
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]
-    const y = 128 + 12 * i
-    svgContent += `<text x="512" y="${y}" style="font-family:autoglyphs-400; font-size:12px; text-anchor:middle; dominant-baseline:middle" >${line}</text>`
+    const line = lines[i];
+    const y = 128 + 12 * i;
+
+    let x = 128;
+    for (const char of line) {
+      const glyph = font.charToGlyph(char);
+      const pathData = glyph.getPath(x, y, 12).toPathData(3);
+      svgContent += `<path d="${pathData}" fill="black" />`;
+      x += (glyph.advanceWidth || 0) * (12 / font.unitsPerEm);
+    }
   }
 
-  svgContent += `</svg>`
+  svgContent += `</svg>`;
 
   return new Response(svgContent, {
     headers: {
       "Content-Type": "image/svg+xml",
     }
-  })
+  });
 }
 
 export {
