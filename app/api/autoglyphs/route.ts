@@ -103,7 +103,7 @@ const GET = async (req: NextRequest) => {
   const fontPath = path.join(process.cwd(), 'public', 'fonts', 'autoglyphs-font', 'autoglyphs-400.ttf');
   const font = await opentype.load(fontPath);
 
-  let svgContent = `<svg width="1024" height="1024"
+  let svgContent = `<svg width="1024" height="1024" viewBox="0 0 1024 1024"
      xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <rect x="0" y="0" width="1024" height="1024" style="fill:white" />`;
