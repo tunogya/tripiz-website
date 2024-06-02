@@ -12,3 +12,15 @@ export interface Post extends VectorDoc {
   created_at: Date,
   updated_at: Date,
 }
+
+export interface Event extends VectorDoc {
+  _id: ObjectId,
+  id: string,
+  kind: number,
+  address: string,
+  created_at: number,
+  content: string,
+  tags: string[][],
+  sig: string,
+  possibly_sensitive?: boolean,
+}
