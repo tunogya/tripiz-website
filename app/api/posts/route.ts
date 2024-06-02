@@ -35,7 +35,7 @@ const GET = async (req: NextRequest) => {
 }
 
 const POST = async (req: NextRequest) => {
-  const {_id, parent_post_id, text, user, category, signature} = await req.json();
+  const {_id, parent_post_id, text, user, category, signature, address} = await req.json();
 
   if (!text || !user) {
     return Response.json({
@@ -66,6 +66,7 @@ const POST = async (req: NextRequest) => {
     _id: _id ? new ObjectId(_id) : new ObjectId(),
     parent_post_id: parent_post_id ? new ObjectId(parent_post_id) : undefined,
     user,
+    address,
     text,
     possibly_sensitive,
     category: category || "reflection",
