@@ -21,6 +21,19 @@ const SYMBOL_SCHEMES = {
   10: ['.', '#', 'O', '.', '.']
 };
 
+const COLOR_SCHEMES = {
+  1: "#FFFFFF",
+  2: "#AFB1F8",
+  3: "#AAEDBA",
+  4: "#D17493",
+  5: "#ECA0D1",
+  6: "#F1A47D",
+  7: "#EFA1AA",
+  8: "#FAE56A",
+  9: "#94BBF4",
+  10: "#D4F47D"
+}
+
 function abs(n: number) {
   return n >= 0 ? n : -n;
 }
@@ -39,24 +52,9 @@ function getScheme(a: number) {
   return 10;
 }
 
-function draw(seed?: string, hash?: string) {
-  let a;
-  if (hash) {
-    const regex = /^0x[0-9a-fA-F]+$/;
-    if (regex.test(hash)) {
-      a = BigInt(hash)
-    } else {
-      return ""
-    }
-  } else if (seed) {
-    a = BigInt('0x' + crypto.createHash('sha256').update(seed.toString()).digest('hex'));
-  } else {
-    return ""
-  }
-
-  let output = PREFIX;
-
+function draw(a: bigint) {
   const schemeIndex = getScheme(Number(a));
+  let output = PREFIX;
   const symbols = SYMBOL_SCHEMES[schemeIndex];
   const mod = symbols.length;
 
@@ -98,15 +96,32 @@ const GET = async (req: NextRequest) => {
     })
   }
 
-  const result = draw(seed, hash);
-
-  const fontPath = path.join(process.cwd(), 'public', 'fonts', 'autoglyphs-font', 'autoglyphs-400.ttf');
+  const fontPath = path.join(process.cwd(), 'public', 'fonts', 'autoglyphs-font', 'autoglyphs-900.ttf');
   const font = await opentype.load(fontPath);
+
+  let a;
+  if (hash) {
+    const regex = /^0x[0-9a-fA-F]+$/;
+    if (regex.test(hash)) {
+      a = BigInt(hash)
+    } else {
+      return ""
+    }
+  } else if (seed) {
+    a = BigInt('0x' + crypto.createHash('sha256').update(seed.toString()).digest('hex'));
+  } else {
+    return ""
+  }
+
+  const schemeIndex = getScheme(Number(a));
+  const backgroundColor = COLOR_SCHEMES[schemeIndex];
+
+  const result = draw(a);
 
   let svgContent = `<svg width="1024" height="1024" viewBox="0 0 1024 1024"
      xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink">
-<rect x="0" y="0" width="1024" height="1024" style="fill:white" />`;
+<rect x="0" y="0" width="1024" height="1024" style="fill:${backgroundColor}" />`;
 
   const lines = result.split('\n');
 
