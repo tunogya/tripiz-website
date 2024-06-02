@@ -24,6 +24,8 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
     data: result.map((item) => ({
       ...item,
       _id: item._id.toString(),
+      updatedAt: item.updated_at,
+      createdAt: item.created_at,
     }))
   })
 }
