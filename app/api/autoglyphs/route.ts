@@ -90,7 +90,19 @@ const GET = async (req: NextRequest) => {
   const seed = req.nextUrl.searchParams.get("seed") || undefined;
   const hash = req.nextUrl.searchParams.get("hash") || undefined;
 
-  if (!seed && !hash) {
+  let a;
+  if (hash) {
+    const regex = /^0x[0-9a-fA-F]+$/;
+    if (regex.test(hash)) {
+      a = BigInt(hash)
+    } else {
+      return new Response("Hash is error", {
+        status: 400,
+      })
+    }
+  } else if (seed) {
+    a = BigInt('0x' + crypto.createHash('sha256').update(seed.toString()).digest('hex'));
+  } else {
     return new Response("Need hash or seed", {
       status: 400,
     })
@@ -98,20 +110,6 @@ const GET = async (req: NextRequest) => {
 
   const fontPath = path.join(process.cwd(), 'public', 'fonts', 'autoglyphs-font', 'autoglyphs-900.ttf');
   const font = await opentype.load(fontPath);
-
-  let a;
-  if (hash) {
-    const regex = /^0x[0-9a-fA-F]+$/;
-    if (regex.test(hash)) {
-      a = BigInt(hash)
-    } else {
-      return ""
-    }
-  } else if (seed) {
-    a = BigInt('0x' + crypto.createHash('sha256').update(seed.toString()).digest('hex'));
-  } else {
-    return ""
-  }
 
   const schemeIndex = getScheme(Number(a));
   const backgroundColor = COLOR_SCHEMES[schemeIndex];
