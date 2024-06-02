@@ -26,6 +26,8 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
     data: {
       ...result,
       _id: result._id.toString(),
+      updatedAt: result.updated_at,
+      createdAt: result.created_at,
     }
   })
 }
