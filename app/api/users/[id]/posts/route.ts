@@ -17,9 +17,9 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
     })
   }
 
-  if (max_results >= 100 || max_results <= 0) {
+  if (max_results >= 20 || max_results <= 0) {
     return Response.json({
-      error: "max_results should > 0 and <= 100",
+      error: "max_results should > 0 and <= 20",
     }, {
       status: 400,
     })
@@ -35,7 +35,7 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
     },
   }, {
     limit: max_results,
-    sort: {createdAt: -1},
+    sort: {created_at: -1},
     skip: skip,
     projection: {
       $vector: 0

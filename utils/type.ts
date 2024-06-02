@@ -5,9 +5,9 @@ export interface Post extends VectorDoc {
   parent_post_id?: ObjectId,
   user: string,
   text: string,
-  flagged?: boolean,
+  possibly_sensitive?: boolean,
   category: string,
   signature?: string,
-  createdAt: Date,
-  updatedAt: Date,
+  created_at: Date,
+  updated_at: Date,
 }

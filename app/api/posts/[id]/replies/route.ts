@@ -10,7 +10,6 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
   const result = await db.collection<Post>("posts").find({
     parent_post_id: new ObjectId(id),
   }, {
-    sort: {updatedAt: -1},
     projection: {
       $vector: 0,
     }

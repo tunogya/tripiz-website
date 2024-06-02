@@ -45,7 +45,7 @@ const POST = async (req: NextRequest) => {
     })
   }
 
-  let $vector: number[] = [], flagged = false;
+  let $vector: number[] = [], possibly_sensitive = false;
 
   try {
     const [vector, moderation] = await Promise.all([
@@ -55,7 +55,7 @@ const POST = async (req: NextRequest) => {
       })
     ])
     $vector = vector;
-    flagged = moderation.results[0].flagged;
+    possibly_sensitive = moderation.results[0].flagged;
   } catch (e) {
     console.log(e)
   }
@@ -67,10 +67,10 @@ const POST = async (req: NextRequest) => {
     parent_post_id: parent_post_id ? new ObjectId(parent_post_id) : undefined,
     user,
     text,
-    flagged,
+    possibly_sensitive,
     category: category || "reflection",
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    created_at: new Date(),
+    updated_at: new Date(),
     signature,
     $vector,
   })

@@ -42,7 +42,7 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
     })
   }
 
-  let $vector: number[] = [], flagged = false;
+  let $vector: number[] = [], possibly_sensitive = false;
 
   try {
     const [vector, moderation] = await Promise.all([
@@ -52,7 +52,7 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
       })
     ])
     $vector = vector;
-    flagged = moderation.results[0].flagged;
+    possibly_sensitive = moderation.results[0].flagged;
   } catch (e) {
     console.log(e)
   }
@@ -64,10 +64,10 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
   }, {
     $set: {
       text,
-      flagged,
+      possibly_sensitive,
       signature,
       $vector,
-      updatedAt: new Date(),
+      updated_at: new Date(),
     }
   })
 
