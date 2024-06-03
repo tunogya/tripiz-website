@@ -3,6 +3,7 @@ import {connectToDatabase} from "@/utils/astradb";
 import {embedding} from "@/utils/embedding";
 import openai from "@/utils/openai";
 import {convertTagsToDict} from "@/utils/convertTagsToDict";
+import {verifyEvent} from "nostr-tools/pure";
 
 const GET = async (req: NextRequest) => {
   const ids = req.nextUrl.searchParams.get("ids")?.split(',').map((item) => item) || [];
@@ -33,9 +34,20 @@ const GET = async (req: NextRequest) => {
 const POST = async (req: NextRequest) => {
   const {id, kind, pubkey, created_at, content, tags, sig} = await req.json();
 
-  if (!id || !kind || !pubkey || !created_at || !content || !tags || !sig) {
+  const event = {
+    id,
+    kind,
+    pubkey,
+    created_at,
+    content,
+    tags,
+    sig,
+  }
+
+  const isValid = verifyEvent(event);
+  if (!isValid) {
     return Response.json({
-      error: "Missing required fields: id, kind, pubkey, created_at, content, tags, sig",
+      error: "Invalid event",
     }, {
       status: 400
     })
