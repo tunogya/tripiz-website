@@ -19,9 +19,7 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
 
   const results = await db.collection("events").find({
     kind: 1,
-    tags: {
-      $elemMatch: { $eq: ["e", id] }
-    },
+    "tags_map.e.0": id,
   }, {
     limit: max_results,
     sort: {created_at: -1},
