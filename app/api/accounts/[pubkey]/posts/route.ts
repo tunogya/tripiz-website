@@ -4,7 +4,7 @@ import {connectToDatabase} from "@/utils/astradb";
 const GET = async (req: NextRequest, {params}: { params: { pubkey: string } }) => {
   const {db} = await connectToDatabase();
 
-  let category: string | null = req.nextUrl.searchParams.get("category") || "";
+  let category: string | null = req.nextUrl.searchParams.get("category")?.toLowerCase() || "";
   let max_results: number = Number(req.nextUrl.searchParams.get("max_results") || 20);
   const skip: number | undefined = Number(req.nextUrl.searchParams.get("skip") || 0);
 
@@ -28,7 +28,11 @@ const GET = async (req: NextRequest, {params}: { params: { pubkey: string } }) =
     kind: 1,
     pubkey: params.pubkey,
     ...(category && {
-      category
+      "tags_map.category.0": category,
+      // Or use this:
+      // "tags_map.category": {
+      //   $in: [category],
+      // },
     }),
   }, {
     limit: max_results,
@@ -45,10 +49,7 @@ const GET = async (req: NextRequest, {params}: { params: { pubkey: string } }) =
 
   if (results) {
     return Response.json({
-      data: results.map((item) => ({
-        ...item,
-        _id: item._id?.toString()
-      })),
+      data: results,
       pagination: {
         hasNext,
         nextSkip: hasNext ? skip + results.length : null,
