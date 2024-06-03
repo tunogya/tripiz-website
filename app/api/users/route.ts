@@ -2,9 +2,9 @@ import {NextRequest} from "next/server";
 import {connectToDatabase} from "@/utils/astradb";
 
 const POST = async (req: NextRequest) => {
-  const { user, expoPushToken } = await req.json();
+  const { address, expoPushToken } = await req.json();
 
-  if (!expoPushToken || !user) {
+  if (!expoPushToken || !address) {
     return Response.json({
       error: "Missing required fields: expoPushToken, user",
     }, {
@@ -15,7 +15,7 @@ const POST = async (req: NextRequest) => {
   const { db } = await connectToDatabase();
 
   const result = await db.collection("users").updateOne({
-    user: user,
+    address: address,
   }, {
     $set: {
       expoPushToken,
