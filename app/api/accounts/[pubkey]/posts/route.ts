@@ -28,11 +28,7 @@ const GET = async (req: NextRequest, {params}: { params: { pubkey: string } }) =
     kind: 1,
     pubkey: params.pubkey,
     ...(category && {
-      tags: {
-        $elemMatch: {
-          $eq: ["category", category]
-        },
-      }
+      category
     }),
   }, {
     limit: max_results,

@@ -2,6 +2,7 @@ import {NextRequest} from "next/server";
 import {connectToDatabase} from "@/utils/astradb";
 import {embedding} from "@/utils/embedding";
 import openai from "@/utils/openai";
+import {convertTagsToDict} from "@/utils/convertTagsToDict";
 
 const GET = async (req: NextRequest) => {
   const ids = req.nextUrl.searchParams.get("ids")?.split(',').map((item) => item) || [];
@@ -63,6 +64,7 @@ const POST = async (req: NextRequest) => {
     pubkey,
     content,
     tags,
+    tags_map: convertTagsToDict(tags),
     sig,
     possibly_sensitive,
     created_at,

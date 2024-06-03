@@ -9,6 +9,7 @@ export interface Event extends VectorDoc {
   content: string,
   tags: [][],
   sig: string,
+  category?: string,
   // other fields
-  possibly_sensitive: boolean
+  possibly_sensitive?: boolean
 }
