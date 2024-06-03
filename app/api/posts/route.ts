@@ -1,6 +1,5 @@
 import {NextRequest} from "next/server";
 import {connectToDatabase} from "@/utils/astradb";
-import {Event} from "@/utils/type";
 import {embedding} from "@/utils/embedding";
 import openai from "@/utils/openai";
 

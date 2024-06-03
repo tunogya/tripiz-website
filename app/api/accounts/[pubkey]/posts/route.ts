@@ -24,7 +24,7 @@ const GET = async (req: NextRequest, {params}: { params: { pubkey: string } }) =
     })
   }
 
-  const query = db.collection<Event>("events").find({
+  const query = db.collection("events").find({
     kind: 1,
     pubkey: params.pubkey,
     ...(category && {

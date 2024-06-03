@@ -1,12 +1,11 @@
 import {NextRequest} from "next/server";
 import {connectToDatabase} from "@/utils/astradb";
-import {Event} from "@/utils/type";
 
 const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id;
   const { db } = await connectToDatabase();
 
-  const result = await db.collection<Event>("events").findOne({
+  const result = await db.collection("events").findOne({
     id: id,
   }, {
     projection: {
@@ -28,7 +27,7 @@ const DELETE = async (req: NextRequest, { params }: { params: { id: string } }) 
   const id = params.id;
   const { db } = await connectToDatabase();
 
-  const result = await db.collection<Event>("events").deleteOne({
+  const result = await db.collection("events").deleteOne({
     id: id,
   })
 
