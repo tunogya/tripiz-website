@@ -24,7 +24,7 @@ const GET = async (req: NextRequest, {params}: { params: { pubkey: string } }) =
     })
   }
 
-  const query = db.collection("events").find({
+  const results = await db.collection("events").find({
     kind: 1,
     pubkey: params.pubkey,
     ...(category && {
@@ -41,9 +41,7 @@ const GET = async (req: NextRequest, {params}: { params: { pubkey: string } }) =
     projection: {
       $vector: 0
     }
-  })
-
-  const results = await query.toArray();
+  }).toArray();
 
   const hasNext = results.length === max_results;
 

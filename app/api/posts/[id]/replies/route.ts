@@ -17,7 +17,7 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
 
   const { db } = await connectToDatabase();
 
-  const result = db.collection("events").find({
+  const results = await db.collection("events").find({
     kind: 1,
     tags: {
       $elemMatch: { $eq: ["e", id] }
@@ -29,15 +29,21 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
     projection: {
       $vector: 0,
     }
-  })
+  }).toArray();
 
-  if (!result) {
+  const hasNext = results.length === max_results;
+
+  if (!results) {
     return Response.json({
       error: "Something went wrong",
     })
   }
   return Response.json({
-    data: result
+    data: results,
+    pagination: {
+      hasNext,
+      nextSkip: hasNext ? skip + results.length : null,
+    },
   })
 }
 
