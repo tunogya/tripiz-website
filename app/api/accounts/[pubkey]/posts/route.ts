@@ -1,12 +1,11 @@
 import {NextRequest} from "next/server";
 import {connectToDatabase} from "@/utils/astradb";
 
-const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
-  const id = params.id;
+const GET = async (req: NextRequest, {params}: { params: { pubkey: string } }) => {
   const {db} = await connectToDatabase();
 
   let category: string | null = req.nextUrl.searchParams.get("category") || "";
-  let max_results: number = Number(req.nextUrl.searchParams.get("max_results") || 10);
+  let max_results: number = Number(req.nextUrl.searchParams.get("max_results") || 20);
   const skip: number | undefined = Number(req.nextUrl.searchParams.get("skip") || 0);
 
   if (!["dreams", "memories", "reflections", ""].includes(category)) {
@@ -25,14 +24,16 @@ const GET = async (req: NextRequest, {params}: { params: { id: string } }) => {
     })
   }
 
-  const query = db.collection("posts").find({
-    user: id,
+  const query = db.collection<Event>("events").find({
+    kind: 1,
+    pubkey: params.pubkey,
     ...(category && {
-      category
+      tags: {
+        $elemMatch: {
+          $eq: ["category", category]
+        },
+      }
     }),
-    parent_post_id: {
-      $exists: false,
-    },
   }, {
     limit: max_results,
     sort: {created_at: -1},

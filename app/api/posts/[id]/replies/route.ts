@@ -1,19 +1,21 @@
 import {NextRequest} from "next/server";
 import {connectToDatabase} from "@/utils/astradb";
-import {Post} from "@/utils/type";
-import {ObjectId} from "@datastax/astra-db-ts";
 
 const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const id = params.id;
   const { db } = await connectToDatabase();
 
-  const result = await db.collection<Post>("posts").find({
-    parent_post_id: new ObjectId(id),
+  const result = db.collection("events").find({
+    kind: 1,
+    tags: {
+      $elemMatch: { $eq: ["e", id] }
+    },
   }, {
     projection: {
+      sig: 0,
       $vector: 0,
     }
-  }).toArray();
+  })
 
   if (!result) {
     return Response.json({
@@ -21,12 +23,7 @@ const GET = async (req: NextRequest, { params }: { params: { id: string } }) => 
     })
   }
   return Response.json({
-    data: result.map((item) => ({
-      ...item,
-      _id: item._id.toString(),
-      updatedAt: item.updated_at,
-      createdAt: item.created_at,
-    }))
+    data: result
   })
 }
 

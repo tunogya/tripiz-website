@@ -1,13 +1,14 @@
-import {ObjectId, VectorDoc} from "@datastax/astra-db-ts";
+import {VectorDoc} from "@datastax/astra-db-ts";
 
-export interface Post extends VectorDoc {
-  _id: ObjectId,
-  parent_post_id?: ObjectId,
-  user: string,
-  address?: string,
-  text: string,
-  possibly_sensitive?: boolean,
-  category: string,
-  created_at: Date,
-  updated_at: Date,
+// id, kind, pubkey, created_at, content, tags, sig
+export interface Event extends VectorDoc {
+  id: string,
+  kind: number,
+  pubkey: string,
+  created_at: number,
+  content: string,
+  tags: [][],
+  sig: string,
+  // other fields
+  possibly_sensitive: boolean
 }

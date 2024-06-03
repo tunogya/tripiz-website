@@ -1,12 +1,11 @@
 import {NextRequest} from "next/server";
 import {connectToDatabase} from "@/utils/astradb";
-import {ObjectId} from "@datastax/astra-db-ts";
-import {Post} from "@/utils/type";
+import {Event} from "@/utils/type";
 import {embedding} from "@/utils/embedding";
 import openai from "@/utils/openai";
 
 const GET = async (req: NextRequest) => {
-  const ids = req.nextUrl.searchParams.get("ids")?.split(',').map((item) => new ObjectId(item)) || [];
+  const ids = req.nextUrl.searchParams.get("ids")?.split(',').map((item) => item) || [];
 
   if (ids.length === 0) {
     return Response.json({
@@ -18,14 +17,11 @@ const GET = async (req: NextRequest) => {
 
   const {db} = await connectToDatabase();
 
-  const results = await db.collection<Post>("posts").find({_id: {$in: ids}}).toArray();
+  const results = await db.collection("events").find({id: {$in: ids}}).toArray();
 
   if (results) {
     return Response.json({
-      data: results.map((item) => ({
-        ...item,
-        _id: item._id?.toString()
-      })),
+      data: results,
     })
   } else {
     return Response.json({
@@ -35,11 +31,11 @@ const GET = async (req: NextRequest) => {
 }
 
 const POST = async (req: NextRequest) => {
-  const {_id, parent_post_id, text, user, category} = await req.json();
+  const {id, kind, pubkey, created_at, content, tags, sig} = await req.json();
 
-  if (!text || !user) {
+  if (!id || !kind || !pubkey || !created_at || !content || !tags || !sig) {
     return Response.json({
-      error: "Missing required fields: text, user",
+      error: "Missing required fields: id, kind, pubkey, created_at, content, tags, sig",
     }, {
       status: 400
     })
@@ -49,9 +45,9 @@ const POST = async (req: NextRequest) => {
 
   try {
     const [vector, moderation] = await Promise.all([
-      embedding(text),
+      embedding(content),
       openai.moderations.create({
-        input: text,
+        input: content,
       })
     ])
     $vector = vector;
@@ -62,20 +58,20 @@ const POST = async (req: NextRequest) => {
 
   const {db} = await connectToDatabase();
 
-  const result = await db.collection<Post>("posts").insertOne({
-    _id: _id ? new ObjectId(_id) : new ObjectId(),
-    parent_post_id: parent_post_id ? new ObjectId(parent_post_id) : undefined,
-    user,
-    text,
+  const result = await db.collection("events").insertOne({
+    id,
+    kind,
+    pubkey,
+    content,
+    tags,
+    sig,
     possibly_sensitive,
-    category: category || "reflection",
-    created_at: new Date(),
-    updated_at: new Date(),
+    created_at,
     $vector,
   })
   if (result.insertedId) {
     return Response.json({
-      id: result.insertedId.toString(),
+      id: result.insertedId,
     })
   } else {
     return Response.json({
