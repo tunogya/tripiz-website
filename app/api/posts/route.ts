@@ -64,10 +64,10 @@ const POST = async (req: NextRequest) => {
     pubkey,
     content,
     tags,
-    tags_map: convertTagsToDict(tags),
     sig,
     possibly_sensitive,
     created_at,
+    tags_map: convertTagsToDict(tags),
     $vector,
   })
   if (result.insertedId) {
