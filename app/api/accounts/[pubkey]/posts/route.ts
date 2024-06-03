@@ -16,7 +16,7 @@ const GET = async (req: NextRequest, {params}: { params: { pubkey: string } }) =
     })
   }
 
-  if (max_results >= 20 || max_results <= 0) {
+  if (max_results > 20 || max_results <= 0) {
     return Response.json({
       error: "max_results should > 0 and <= 20",
     }, {
