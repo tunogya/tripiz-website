@@ -8,19 +8,6 @@ export interface Post extends VectorDoc {
   text: string,
   possibly_sensitive?: boolean,
   category: string,
-  signature?: string,
   created_at: Date,
   updated_at: Date,
-}
-
-export interface Event extends VectorDoc {
-  _id: ObjectId,
-  id: string,
-  kind: number,
-  address: string,
-  created_at: number,
-  content: string,
-  tags: string[][],
-  sig: string,
-  possibly_sensitive?: boolean,
 }

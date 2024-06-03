@@ -2,7 +2,7 @@ import {NextRequest} from "next/server";
 import {connectToDatabase} from "@/utils/astradb";
 
 const POST = async (req: NextRequest) => {
-  const { user, expoPushToken, signature } = await req.json();
+  const { user, expoPushToken } = await req.json();
 
   if (!expoPushToken || !user) {
     return Response.json({
@@ -19,7 +19,6 @@ const POST = async (req: NextRequest) => {
   }, {
     $set: {
       expoPushToken,
-      signature,
     }
   }, {
     upsert: true,
