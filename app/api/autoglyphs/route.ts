@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import * as crypto from "crypto";
 import opentype from "opentype.js";
-import path from 'path';
+import path from "path";
 
 const SIZE = 64;
 const HALF_SIZE = SIZE / 2;
@@ -9,16 +9,16 @@ const HALF_SIZE = SIZE / 2;
 const PREFIX = "";
 
 const SYMBOL_SCHEMES = {
-  1: ['.', 'X', '/', '\\', '.'],
-  2: ['.', '+', '-', '|', '.'],
-  3: ['.', '/', '\\', '.', '.'],
-  4: ['.', '\\', '|', '-', '/'],
-  5: ['.', 'O', '|', '-', '.'],
-  6: ['.', '\\', '\\', '.', '.'],
-  7: ['.', '#', '|', '-', '+'],
-  8: ['.', 'O', 'O', '.', '.'],
-  9: ['.', '#', '.', '.', '.'],
-  10: ['.', '#', 'O', '.', '.']
+  1: [".", "X", "/", "\\", "."],
+  2: [".", "+", "-", "|", "."],
+  3: [".", "/", "\\", ".", "."],
+  4: [".", "\\", "|", "-", "/"],
+  5: [".", "O", "|", "-", "."],
+  6: [".", "\\", "\\", ".", "."],
+  7: [".", "#", "|", "-", "+"],
+  8: [".", "O", "O", ".", "."],
+  9: [".", "#", ".", ".", "."],
+  10: [".", "#", "O", ".", "."],
 };
 
 const COLOR_SCHEMES = {
@@ -31,8 +31,8 @@ const COLOR_SCHEMES = {
   7: "#EFA1AA",
   8: "#FAE56A",
   9: "#94BBF4",
-  10: "#D4F47D"
-}
+  10: "#D4F47D",
+};
 
 function abs(n: number) {
   return n >= 0 ? n : -n;
@@ -77,10 +77,10 @@ function draw(a: bigint) {
       }
       x = x * Number(a);
       // @ts-ignore
-      const v = Math.abs(x * y / Number(2n**32n)) % mod;
+      const v = Math.abs((x * y) / Number(2n ** 32n)) % mod;
       output += symbols[v];
     }
-    output += '\n';
+    output += "\n";
   }
 
   return output;
@@ -94,21 +94,29 @@ const GET = async (req: NextRequest) => {
   if (hash) {
     const regex = /^0x[0-9a-fA-F]+$/;
     if (regex.test(hash)) {
-      a = BigInt(hash)
+      a = BigInt(hash);
     } else {
       return new Response("Hash is error", {
         status: 400,
-      })
+      });
     }
   } else if (seed) {
-    a = BigInt('0x' + crypto.createHash('sha256').update(seed.toString()).digest('hex'));
+    a = BigInt(
+      "0x" + crypto.createHash("sha256").update(seed.toString()).digest("hex"),
+    );
   } else {
     return new Response("Need hash or seed", {
       status: 400,
-    })
+    });
   }
 
-  const fontPath = path.join(process.cwd(), 'public', 'fonts', 'autoglyphs-font', 'autoglyphs-900.ttf');
+  const fontPath = path.join(
+    process.cwd(),
+    "public",
+    "fonts",
+    "autoglyphs-font",
+    "autoglyphs-900.ttf",
+  );
   const font = await opentype.load(fontPath);
 
   const schemeIndex = getScheme(Number(a));
@@ -121,7 +129,7 @@ const GET = async (req: NextRequest) => {
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <rect x="0" y="0" width="1024" height="1024" style="fill:${backgroundColor}" />`;
 
-  const lines = result.split('\n');
+  const lines = result.split("\n");
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -141,10 +149,8 @@ const GET = async (req: NextRequest) => {
   return new Response(svgContent, {
     headers: {
       "Content-Type": "image/svg+xml",
-    }
+    },
   });
-}
+};
 
-export {
-  GET
-}
+export { GET };

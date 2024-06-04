@@ -1,4 +1,4 @@
-import {DataAPIClient, Db} from "@datastax/astra-db-ts";
+import { DataAPIClient, Db } from "@datastax/astra-db-ts";
 
 let cachedClient: DataAPIClient | null = null;
 let cachedDb: Db | null = null;
@@ -18,6 +18,6 @@ export async function connectToDatabase() {
 
     return { client, db };
   } catch (error) {
-    throw new Error('Failed to connect to database');
+    throw new Error("Failed to connect to database");
   }
 }

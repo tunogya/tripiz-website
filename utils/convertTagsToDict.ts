@@ -1,7 +1,7 @@
 export const convertTagsToDict = (tags: [][]) => {
   const tagsDict = {};
 
-  tags.forEach(tag => {
+  tags.forEach((tag) => {
     if (tag.length === 0) {
       return;
     }
@@ -12,4 +12,4 @@ export const convertTagsToDict = (tags: [][]) => {
   });
 
   return tagsDict;
-}
+};
