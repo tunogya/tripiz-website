@@ -16,17 +16,6 @@ const GET = async (
     req.nextUrl.searchParams.get("skip") || 0,
   );
 
-  if (!["dreams", "memories", "reflections", ""].includes(category)) {
-    return Response.json(
-      {
-        error: "category should be one of dreams,memories,reflections, or null",
-      },
-      {
-        status: 400,
-      },
-    );
-  }
-
   if (max_results > 20 || max_results <= 0) {
     return Response.json(
       {
