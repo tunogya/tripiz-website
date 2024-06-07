@@ -61,4 +61,10 @@ const GET = async (
   });
 };
 
-export { GET };
+const POST = async (req: NextRequest) => {
+  return Response.json({
+    error: "Method not allowed",
+  });
+};
+
+export { GET, POST };
