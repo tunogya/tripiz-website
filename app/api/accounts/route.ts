@@ -35,11 +35,11 @@ const POST = async (req: NextRequest) => {
   const { db } = await connectToDatabase();
 
   const result = await db.collection("events").updateOne({
-    id,
+    pubkey: pubkey,
   }, {
     $set: {
+      id,
       kind,
-      pubkey,
       content,
       tags,
       sig,
