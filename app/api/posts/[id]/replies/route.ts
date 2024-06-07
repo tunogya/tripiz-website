@@ -152,21 +152,21 @@ const POST = async (req: NextRequest, { params }: { params: { id: string } }) =>
 
   const jsonData = JSON.parse(reply);
   const data = jsonData.data;
-  // [{username: "", text: ""}]
+  // [{name: "", text: ""}]
 
   let events = [];
   for (let i = 0; i < data.length; i++) {
     const item = data[i];
-    const username = item.username;
-    const text = item.text;
 
-    let sk = generateSecretKey(salt, username) // `sk` is a Uint8Array
+    let sk = generateSecretKey(salt, item.name.toLowerCase()) // `sk` is a Uint8Array
     const event = finalizeEvent({
       kind: 1,
       created_at: Math.floor(Date.now() / 1000),
-      tags: [],
-      content: 'hello',
-    }, sk)
+      tags: [
+        ["e", params.id],
+      ],
+      content: item.text,
+    }, sk);
     events.push(event);
   }
   const result = await db.collection("events").insertMany(events);
