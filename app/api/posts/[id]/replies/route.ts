@@ -69,8 +69,18 @@ const GET = async (
   });
 };
 
-// 即时批量生成 AI 评论
 const POST = async (req: NextRequest, { params }: { params: { id: string } }) => {
+  const isWorking = await redis.get(`working:${params.id}`);
+  if (isWorking) {
+    return Response.json({
+      error: "Already working",
+    }, {
+      status: 403,
+    });
+  }
+  await redis.set(`working:${params.id}`, true, {
+    ex: 5 * 60,
+  });
   const { db } = await connectToDatabase();
   const post = await db.collection("events").findOne({
     id: params.id,
@@ -93,23 +103,24 @@ const POST = async (req: NextRequest, { params }: { params: { id: string } }) =>
     });
   }
 
-  let isValid = false;
-  const isValidCache = await redis.get(`${pubkey}:${revenuecat_entitlement_id}`);
-  if (isValidCache) {
-    isValid = true;
-  } else {
-    const subscriptions = await fetch(`https://api.revenuecat.com/v2/projects/${revenuecat_proj_id}/customers/${pubkey}/subscriptions?environment=production`)
-      .then((res) => res.json());
+  let isValid = await redis.get(`${pubkey}:${revenuecat_entitlement_id}`);
 
-    isValid = subscriptions.items.some((item: any) => {
-      return item.gives_access === true
-        && item.current_period_ends_at > Date.now()
-        && item.entitlements.items.some((e_item: any) => e_item.id === revenuecat_entitlement_id);
-    })
+  if (!isValid) {
+    try {
+      const subscriptions = await fetch(`https://api.revenuecat.com/v2/projects/${revenuecat_proj_id}/customers/${pubkey}/subscriptions?environment=production`)
+        .then((res) => res.json());
 
-    await redis.set(`${pubkey}:${revenuecat_entitlement_id}`, true, {
-      ex: 4 * 60 * 60, // 4h
-    })
+      isValid = subscriptions.items.some((item: any) => {
+        return item.gives_access === true
+          && item.current_period_ends_at > Date.now()
+          && item.entitlements.items.some((e_item: any) => e_item.id === revenuecat_entitlement_id);
+      })
+      await redis.set(`${pubkey}:${revenuecat_entitlement_id}`, true, {
+        ex: 4 * 60 * 60, // 4h
+      })
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   if (!isValid) {
@@ -120,16 +131,35 @@ const POST = async (req: NextRequest, { params }: { params: { id: string } }) =>
     });
   }
 
-  // 访问OpenAI即时生成评论
   const request = await openai.chat.completions.create({
     messages: [
       {
         role: "system",
-        content: ``,
+        content: `#### User Requirement Description: 
+
+The user will write a reflection, with the theme being their memories, dreams, or thoughts. Your task is:
+
+1. Find multiple pieces of text from human civilization's history that closely match the user's reflection and can evoke an emotional resonance.
+2. These texts can be real quotes from a historical figure or words spoken by a character in a book.
+3. Ensure that the texts are authentic and not fictional.
+
+#### Return Format: 
+
+If you find suitable texts, return a JSON array where each element contains the following fields:
+
+- \`"name"\`: The author of the text or the character who said it.
+- \`"text"\`: The text that resonates with the user's reflection.
+
+For example:
+\`\`\`json
+[ { "name": "Li Bai", "text": "Heaven has endowed me with talents, and they will be put to good use. Wealth may be scattered, but it will return." }, { "name": "Marcus Aurelius", "text": "The happiness of your life depends upon the quality of your thoughts." } ]
+\`\`\`
+
+If no suitable texts are found, return an empty array.`,
       },
       {
         role: "user",
-        content: ``,
+        content: post.content,
       },
     ],
     model: "gpt-4o",
@@ -150,27 +180,57 @@ const POST = async (req: NextRequest, { params }: { params: { id: string } }) =>
     });
   }
 
-  const jsonData = JSON.parse(reply);
-  const data = jsonData.data;
+  const data = JSON.parse(reply);
   // [{name: "", text: ""}]
 
-  let events = [];
+  let eventsKind1 = [];
+  let eventsKind0Promise = [];
   for (let i = 0; i < data.length; i++) {
     const item = data[i];
 
-    let sk = generateSecretKey(salt, item.name.toLowerCase()) // `sk` is a Uint8Array
-    const event = finalizeEvent({
+    let userSk = generateSecretKey(salt, item.name.toLowerCase()) // `sk` is a Uint8Array
+    const randomNumber = Math.floor(Math.random() * 10000);
+    const eventUserInfo = finalizeEvent({
+      kind: 0,
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [
+        ["name", ],
+      ],
+      content: JSON.stringify({
+        name: item.name,
+        picture: `https://www.larvalabs.com/cryptopunks/cryptopunk${randomNumber.toString().padStart(4, "0")}.png`,
+      }),
+    }, userSk);
+    eventsKind0Promise.push(db.collection("events").updateOne({
+      pubkey: pubkey,
+    }, {
+      $set: {
+        id: eventUserInfo.id,
+        kind: eventUserInfo.kind,
+        content: eventUserInfo.content,
+        tags: eventUserInfo.tags,
+        sig: eventUserInfo.sig,
+        created_at: eventUserInfo.created_at,
+      },
+    }, {
+      upsert: true,
+    }).then((res) => {
+      console.log(res)
+    }));
+    const eventComment = finalizeEvent({
       kind: 1,
       created_at: Math.floor(Date.now() / 1000),
       tags: [
         ["e", params.id],
       ],
       content: item.text,
-    }, sk);
-    events.push(event);
+    }, userSk);
+    eventsKind1.push(eventComment);
   }
-  const result = await db.collection("events").insertMany(events);
-  return Response.json(result)
+  await Promise.all(eventsKind0Promise).catch((e) => console.log(e));
+  await redis.del(`working:${params.id}`).catch((e) => console.log(e));
+  const result = await db.collection("events").insertMany(eventsKind1);
+  return Response.json(result);
 };
 
 export { GET, POST };
