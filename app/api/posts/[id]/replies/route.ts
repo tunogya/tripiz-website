@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { connectToDatabase } from "@/utils/astradb";
 import redis from "@/utils/redis";
 import openai from "@/utils/openai";
-import {finalizeEvent} from "nostr-tools/pure";
+import {finalizeEvent, getPublicKey} from "nostr-tools/pure";
 import {generateSecretKey} from "@/utils/generateSecretKey";
 
 const revenuecat_proj_id = process.env.REVENUECAT_PROJECT_ID;
@@ -190,6 +190,7 @@ If no suitable texts are found, return an empty array.`,
     const item = data[i];
 
     let userSk = generateSecretKey(salt, item.name.toLowerCase()) // `sk` is a Uint8Array
+    const userPubkey = getPublicKey(userSk);
     const randomNumber = Math.floor(Math.random() * 10000);
     const eventUserInfo = finalizeEvent({
       kind: 0,
@@ -202,7 +203,7 @@ If no suitable texts are found, return an empty array.`,
     }, userSk);
     await db.collection("events").updateOne({
       kind: 0,
-      pubkey: pubkey,
+      pubkey: userPubkey,
     }, {
       $set: {
         id: eventUserInfo.id,
