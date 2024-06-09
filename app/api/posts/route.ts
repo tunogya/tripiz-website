@@ -47,12 +47,16 @@ const POST = async (req: NextRequest) => {
   if (kind !== 1) {
     return Response.json({
       error: "kind should be 1",
+    }, {
+      status: 400
     })
   }
 
   if (content === "") {
     return Response.json({
       error: "content should not be empty",
+    }, {
+      status: 400
     })
   }
 
