@@ -1,4 +1,4 @@
-export const convertTagsToDict = (tags: [][]) => {
+export const convertTagsToDict = (tags: Array<any>) => {
   const tagsDict = {};
 
   tags.forEach((tag) => {

@@ -4,6 +4,7 @@ import redis from "@/utils/redis";
 import openai from "@/utils/openai";
 import {finalizeEvent, getPublicKey} from "nostr-tools/pure";
 import {generateSecretKey} from "@/utils/generateSecretKey";
+import {convertTagsToDict} from "@/utils/convertTagsToDict";
 
 const revenuecat_proj_id = process.env.REVENUECAT_PROJECT_ID;
 const revenuecat_entitlement_id = process.env.REVENUECAT_ENTITLEMENT_ID;
@@ -216,19 +217,18 @@ If no suitable texts are found, return an empty array.`,
     }, {
       upsert: true,
     });
+    const tags = [
+      ["e", params.id],
+    ];
     const eventComment = finalizeEvent({
       kind: 1,
       created_at: Math.floor(Date.now() / 1000),
-      tags: [
-        ["e", params.id],
-      ],
+      tags: tags,
       content: item.text,
     }, userSk);
     eventsKind1.push({
       ...eventComment,
-      tags_map: {
-        e: [params.id],
-      },
+      tags_map: convertTagsToDict(tags),
     });
   }
   await redis.del(`working:${params.id}`).catch((e) => console.log(e));
