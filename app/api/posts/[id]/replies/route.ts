@@ -189,7 +189,7 @@ If no suitable texts are found, return an empty array.`,
       },
       {
         role: "user",
-        content: `Existing comments: ${commentsString}. `,
+        content: `Existing comments: ${commentsString}.`,
       },
       {
         role: "user",
