@@ -202,6 +202,7 @@ If no suitable texts are found, return an empty array.`,
       }),
     }, userSk);
     eventsKind0Promise.push(db.collection("events").updateOne({
+      kind: 0,
       pubkey: pubkey,
     }, {
       $set: {
