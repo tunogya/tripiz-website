@@ -96,40 +96,42 @@ const POST = async (req: NextRequest, { params }: { params: { id: string } }) =>
   const possibly_sensitive = post.possibly_sensitive || false;
 
   if (possibly_sensitive) {
+    await redis.del(`working:${params.id}`).catch((e) => console.log(e));
     return Response.json({
       error: "Possibly sensitive content",
     }, {
       status: 403,
     });
   }
+  //
+  // let isValid = await redis.get(`${pubkey}:${revenuecat_entitlement_id}`);
+  //
+  // if (!isValid) {
+  //   try {
+  //     const subscriptions = await fetch(`https://api.revenuecat.com/v2/projects/${revenuecat_proj_id}/customers/${pubkey}/subscriptions?environment=production`)
+  //       .then((res) => res.json());
+  //
+  //     isValid = subscriptions.items.some((item: any) => {
+  //       return item.gives_access === true
+  //         && item.current_period_ends_at > Date.now()
+  //         && item.entitlements.items.some((e_item: any) => e_item.id === revenuecat_entitlement_id);
+  //     })
+  //     await redis.set(`${pubkey}:${revenuecat_entitlement_id}`, true, {
+  //       ex: 4 * 60 * 60, // 4h
+  //     })
+  //   } catch (e) {
+  //     console.log(e)
+  //   }
+  // }
 
-  let isValid = await redis.get(`${pubkey}:${revenuecat_entitlement_id}`);
-
-  if (!isValid) {
-    try {
-      const subscriptions = await fetch(`https://api.revenuecat.com/v2/projects/${revenuecat_proj_id}/customers/${pubkey}/subscriptions?environment=production`)
-        .then((res) => res.json());
-
-      isValid = subscriptions.items.some((item: any) => {
-        return item.gives_access === true
-          && item.current_period_ends_at > Date.now()
-          && item.entitlements.items.some((e_item: any) => e_item.id === revenuecat_entitlement_id);
-      })
-      await redis.set(`${pubkey}:${revenuecat_entitlement_id}`, true, {
-        ex: 4 * 60 * 60, // 4h
-      })
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  if (!isValid) {
-    return Response.json({
-      error: "Subscription not found",
-    }, {
-      status: 403,
-    });
-  }
+  // if (!isValid) {
+  //   await redis.del(`working:${params.id}`).catch((e) => console.log(e));
+  //   return Response.json({
+  //     error: "Subscription not found",
+  //   }, {
+  //     status: 403,
+  //   });
+  // }
 
   const request = await openai.chat.completions.create({
     messages: [
@@ -152,7 +154,7 @@ If you find suitable texts, return a JSON array where each element contains the 
 
 For example:
 \`\`\`json
-[ { "name": "Li Bai", "text": "Heaven has endowed me with talents, and they will be put to good use. Wealth may be scattered, but it will return." }, { "name": "Marcus Aurelius", "text": "The happiness of your life depends upon the quality of your thoughts." } ]
+{"data": ["name":"Li Bai","text":"Heaven has endowed me with talents, and they will be put to good use. Wealth may be scattered, but it will return."},{"name":"Marcus Aurelius","text":"The happiness of your life depends upon the quality of your thoughts."}]}
 \`\`\`
 
 If no suitable texts are found, return an empty array.`,
@@ -175,13 +177,13 @@ If no suitable texts are found, return an empty array.`,
   const reply = request.choices[0].message.content;
 
   if (!reply) {
+    await redis.del(`working:${params.id}`).catch((e) => console.log(e));
     return Response.json({
       error: "Something went wrong",
     });
   }
 
-  const data = JSON.parse(reply);
-  // [{name: "", text: ""}]
+  const data = JSON.parse(reply)?.data || [];
 
   let eventsKind1 = [];
   let eventsKind0Promise = [];
@@ -193,9 +195,7 @@ If no suitable texts are found, return an empty array.`,
     const eventUserInfo = finalizeEvent({
       kind: 0,
       created_at: Math.floor(Date.now() / 1000),
-      tags: [
-        ["name", ],
-      ],
+      tags: [],
       content: JSON.stringify({
         name: item.name,
         picture: `https://www.larvalabs.com/cryptopunks/cryptopunk${randomNumber.toString().padStart(4, "0")}.png`,
@@ -214,8 +214,6 @@ If no suitable texts are found, return an empty array.`,
       },
     }, {
       upsert: true,
-    }).then((res) => {
-      console.log(res)
     }));
     const eventComment = finalizeEvent({
       kind: 1,
@@ -225,7 +223,12 @@ If no suitable texts are found, return an empty array.`,
       ],
       content: item.text,
     }, userSk);
-    eventsKind1.push(eventComment);
+    eventsKind1.push({
+      ...eventComment,
+      tags_map: {
+        e: params.id,
+      },
+    });
   }
   await Promise.all(eventsKind0Promise).catch((e) => console.log(e));
   await redis.del(`working:${params.id}`).catch((e) => console.log(e));
