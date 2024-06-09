@@ -54,13 +54,14 @@ const GET = async (
     )
     .toArray();
 
-  const hasNext = results.length === max_results;
-
-  if (!results) {
-    return Response.json({
-      error: "Something went wrong",
+  if (results.length === 0) {
+    await fetch(`https://tripiz.abandon.ai/api/posts/${id}/replies`, {
+      method: "POST",
     });
   }
+
+  const hasNext = results.length === max_results;
+
   return Response.json({
     data: results,
     pagination: {
