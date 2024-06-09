@@ -2,9 +2,9 @@ import { NextRequest } from "next/server";
 import { connectToDatabase } from "@/utils/astradb";
 import redis from "@/utils/redis";
 import openai from "@/utils/openai";
-import {finalizeEvent, getPublicKey} from "nostr-tools/pure";
-import {generateSecretKey} from "@/utils/generateSecretKey";
-import {convertTagsToDict} from "@/utils/convertTagsToDict";
+import { finalizeEvent, getPublicKey } from "nostr-tools/pure";
+import { generateSecretKey } from "@/utils/generateSecretKey";
+import { convertTagsToDict } from "@/utils/convertTagsToDict";
 
 const revenuecat_proj_id = process.env.REVENUECAT_PROJECT_ID;
 const revenuecat_entitlement_id = process.env.REVENUECAT_ENTITLEMENT_ID;
@@ -70,14 +70,20 @@ const GET = async (
   });
 };
 
-const POST = async (req: NextRequest, { params }: { params: { id: string } }) => {
+const POST = async (
+  req: NextRequest,
+  { params }: { params: { id: string } },
+) => {
   const isWorking = await redis.get(`working:${params.id}`);
   if (isWorking) {
-    return Response.json({
-      error: "Already working",
-    }, {
-      status: 403,
-    });
+    return Response.json(
+      {
+        error: "Already working",
+      },
+      {
+        status: 403,
+      },
+    );
   }
   await redis.set(`working:${params.id}`, true, {
     ex: 5 * 60,
@@ -87,22 +93,28 @@ const POST = async (req: NextRequest, { params }: { params: { id: string } }) =>
     id: params.id,
   });
   if (!post) {
-    return Response.json({
-      error: "404",
-    }, {
-      status: 404,
-    });
+    return Response.json(
+      {
+        error: "404",
+      },
+      {
+        status: 404,
+      },
+    );
   }
   const pubkey = post.pubkey;
   const possibly_sensitive = post.possibly_sensitive || false;
 
   if (possibly_sensitive) {
     await redis.del(`working:${params.id}`).catch((e) => console.log(e));
-    return Response.json({
-      error: "Possibly sensitive content",
-    }, {
-      status: 403,
-    });
+    return Response.json(
+      {
+        error: "Possibly sensitive content",
+      },
+      {
+        status: 403,
+      },
+    );
   }
   //
   // let isValid = await redis.get(`${pubkey}:${revenuecat_entitlement_id}`);
@@ -190,42 +202,50 @@ If no suitable texts are found, return an empty array.`,
   for (let i = 0; i < data.length; i++) {
     const item = data[i];
 
-    let userSk = generateSecretKey(salt, item.name.toLowerCase()) // `sk` is a Uint8Array
+    let userSk = generateSecretKey(salt, item.name.toLowerCase()); // `sk` is a Uint8Array
     const userPubkey = getPublicKey(userSk);
     const randomNumber = Math.floor(Math.random() * 10000);
-    const eventUserInfo = finalizeEvent({
-      kind: 0,
-      created_at: Math.floor(Date.now() / 1000),
-      tags: [],
-      content: JSON.stringify({
-        name: item.name,
-        picture: `https://www.larvalabs.com/cryptopunks/cryptopunk${randomNumber.toString().padStart(4, "0")}.png`,
-      }),
-    }, userSk);
-    await db.collection("events").updateOne({
-      kind: 0,
-      pubkey: userPubkey,
-    }, {
-      $set: {
-        id: eventUserInfo.id,
-        kind: eventUserInfo.kind,
-        content: eventUserInfo.content,
-        tags: eventUserInfo.tags,
-        sig: eventUserInfo.sig,
-        created_at: eventUserInfo.created_at,
+    const eventUserInfo = finalizeEvent(
+      {
+        kind: 0,
+        created_at: Math.floor(Date.now() / 1000),
+        tags: [],
+        content: JSON.stringify({
+          name: item.name,
+          picture: `https://www.larvalabs.com/cryptopunks/cryptopunk${randomNumber.toString().padStart(4, "0")}.png`,
+        }),
       },
-    }, {
-      upsert: true,
-    });
-    const tags = [
-      ["e", params.id],
-    ];
-    const eventComment = finalizeEvent({
-      kind: 1,
-      created_at: Math.floor(Date.now() / 1000),
-      tags: tags,
-      content: item.text,
-    }, userSk);
+      userSk,
+    );
+    await db.collection("events").updateOne(
+      {
+        kind: 0,
+        pubkey: userPubkey,
+      },
+      {
+        $set: {
+          id: eventUserInfo.id,
+          kind: eventUserInfo.kind,
+          content: eventUserInfo.content,
+          tags: eventUserInfo.tags,
+          sig: eventUserInfo.sig,
+          created_at: eventUserInfo.created_at,
+        },
+      },
+      {
+        upsert: true,
+      },
+    );
+    const tags = [["e", params.id]];
+    const eventComment = finalizeEvent(
+      {
+        kind: 1,
+        created_at: Math.floor(Date.now() / 1000),
+        tags: tags,
+        content: item.text,
+      },
+      userSk,
+    );
     eventsKind1.push({
       ...eventComment,
       tags_map: convertTagsToDict(tags),

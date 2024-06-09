@@ -1,9 +1,9 @@
-import {NextRequest} from "next/server";
-import {connectToDatabase} from "@/utils/astradb";
-import {embedding} from "@/utils/embedding";
+import { NextRequest } from "next/server";
+import { connectToDatabase } from "@/utils/astradb";
+import { embedding } from "@/utils/embedding";
 import openai from "@/utils/openai";
-import {convertTagsToDict} from "@/utils/convertTagsToDict";
-import {verifyEvent} from "nostr-tools/pure";
+import { convertTagsToDict } from "@/utils/convertTagsToDict";
+import { verifyEvent } from "nostr-tools/pure";
 
 const GET = async (req: NextRequest) => {
   const ids =
@@ -23,11 +23,11 @@ const GET = async (req: NextRequest) => {
     );
   }
 
-  const {db} = await connectToDatabase();
+  const { db } = await connectToDatabase();
 
   const results = await db
     .collection("events")
-    .find({id: {$in: ids}})
+    .find({ id: { $in: ids } })
     .toArray();
 
   if (results) {
@@ -42,22 +42,28 @@ const GET = async (req: NextRequest) => {
 };
 
 const POST = async (req: NextRequest) => {
-  const {id, kind, pubkey, created_at, content, tags, sig} = await req.json();
+  const { id, kind, pubkey, created_at, content, tags, sig } = await req.json();
 
   if (kind !== 1) {
-    return Response.json({
-      error: "kind should be 1",
-    }, {
-      status: 400
-    })
+    return Response.json(
+      {
+        error: "kind should be 1",
+      },
+      {
+        status: 400,
+      },
+    );
   }
 
   if (content === "") {
-    return Response.json({
-      error: "content should not be empty",
-    }, {
-      status: 400
-    })
+    return Response.json(
+      {
+        error: "content should not be empty",
+      },
+      {
+        status: 400,
+      },
+    );
   }
 
   const isValid = verifyEvent({
@@ -97,7 +103,7 @@ const POST = async (req: NextRequest) => {
     console.log(e);
   }
 
-  const {db} = await connectToDatabase();
+  const { db } = await connectToDatabase();
 
   const result = await db.collection("events").insertOne({
     id,
@@ -122,4 +128,4 @@ const POST = async (req: NextRequest) => {
   }
 };
 
-export {GET, POST};
+export { GET, POST };

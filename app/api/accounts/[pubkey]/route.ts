@@ -7,19 +7,17 @@ const GET = async (
 ) => {
   const { db } = await connectToDatabase();
 
-  const result = await db
-    .collection("events")
-    .findOne(
-      {
-        kind: 0,
-        pubkey: params.pubkey,
+  const result = await db.collection("events").findOne(
+    {
+      kind: 0,
+      pubkey: params.pubkey,
+    },
+    {
+      projection: {
+        $vector: 0,
       },
-      {
-        projection: {
-          $vector: 0,
-        },
-      },
-    );
+    },
+  );
 
   if (result && result?.content) {
     try {
@@ -31,11 +29,14 @@ const GET = async (
       });
     }
   } else {
-    return Response.json({
-      error: "404",
-    }, {
-      status: 404,
-    });
+    return Response.json(
+      {
+        error: "404",
+      },
+      {
+        status: 404,
+      },
+    );
   }
 };
 

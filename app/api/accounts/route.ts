@@ -1,6 +1,6 @@
-import {NextRequest} from "next/server";
-import {connectToDatabase} from "@/utils/astradb";
-import {verifyEvent} from "nostr-tools/pure";
+import { NextRequest } from "next/server";
+import { connectToDatabase } from "@/utils/astradb";
+import { verifyEvent } from "nostr-tools/pure";
 
 const POST = async (req: NextRequest) => {
   const { id, kind, pubkey, created_at, content, tags, sig } = await req.json();
@@ -8,7 +8,7 @@ const POST = async (req: NextRequest) => {
   if (kind !== 0) {
     return Response.json({
       error: "kind should be 0",
-    })
+    });
   }
 
   const isValid = verifyEvent({
@@ -34,21 +34,25 @@ const POST = async (req: NextRequest) => {
 
   const { db } = await connectToDatabase();
 
-  const result = await db.collection("events").updateOne({
-    kind: 0,
-    pubkey: pubkey,
-  }, {
-    $set: {
-      id,
-      kind,
-      content,
-      tags,
-      sig,
-      created_at,
+  const result = await db.collection("events").updateOne(
+    {
+      kind: 0,
+      pubkey: pubkey,
     },
-  }, {
-    upsert: true,
-  });
+    {
+      $set: {
+        id,
+        kind,
+        content,
+        tags,
+        sig,
+        created_at,
+      },
+    },
+    {
+      upsert: true,
+    },
+  );
 
   if (result.upsertedId) {
     return Response.json({
@@ -61,6 +65,4 @@ const POST = async (req: NextRequest) => {
   }
 };
 
-export {
-  POST
-}
+export { POST };
