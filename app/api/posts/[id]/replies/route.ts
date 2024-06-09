@@ -74,17 +74,6 @@ const POST = async (
   req: NextRequest,
   { params }: { params: { id: string } },
 ) => {
-  const isWorking = await redis.get(`working:${params.id}`);
-  // if (isWorking) {
-  //   return Response.json(
-  //     {
-  //       error: "Already working",
-  //     },
-  //     {
-  //       status: 403,
-  //     },
-  //   );
-  // }
   await redis.set(`working:${params.id}`, true, {
     ex: 5 * 60,
   });
@@ -185,15 +174,7 @@ If no suitable texts are found, return an empty array.`,
       },
       {
         role: "user",
-        content: `Content: ${post.content}.`,
-      },
-      {
-        role: "assistant",
-        content: `Existing comments: ${commentsString}.`,
-      },
-      {
-        role: "user",
-        content: `Please provide new and unique responses.`,
+        content: post.content,
       },
     ],
     model: "gpt-4o",
