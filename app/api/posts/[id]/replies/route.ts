@@ -75,6 +75,9 @@ const POST = async (
   req: NextRequest,
   { params }: { params: { id: string } },
 ) => {
+  await redis.set(`working:${params.id}`, true, {
+    ex: 5 * 60,
+  });
   const { db } = await connectToDatabase();
   const post = await db.collection("events").findOne({
     id: params.id,
@@ -101,6 +104,7 @@ const POST = async (
   const possibly_sensitive = post.possibly_sensitive || false;
 
   if (possibly_sensitive) {
+    await redis.del(`working:${params.id}`).catch((e) => console.log(e));
     return Response.json(
       {
         error: "Possibly sensitive content",
@@ -187,6 +191,7 @@ If no suitable texts are found, return an empty array.`,
   const reply = request.choices[0].message.content;
 
   if (!reply) {
+    await redis.del(`working:${params.id}`).catch((e) => console.log(e));
     return Response.json({
       error: "Something went wrong",
     });
@@ -247,6 +252,7 @@ If no suitable texts are found, return an empty array.`,
       tags_map: convertTagsToDict(tags),
     });
   }
+  await redis.del(`working:${params.id}`).catch((e) => console.log(e));
   const result = await db.collection("events").insertMany(eventsKind1);
   return Response.json(result);
 };
