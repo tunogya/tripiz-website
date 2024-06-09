@@ -75,16 +75,16 @@ const POST = async (
   { params }: { params: { id: string } },
 ) => {
   const isWorking = await redis.get(`working:${params.id}`);
-  if (isWorking) {
-    return Response.json(
-      {
-        error: "Already working",
-      },
-      {
-        status: 403,
-      },
-    );
-  }
+  // if (isWorking) {
+  //   return Response.json(
+  //     {
+  //       error: "Already working",
+  //     },
+  //     {
+  //       status: 403,
+  //     },
+  //   );
+  // }
   await redis.set(`working:${params.id}`, true, {
     ex: 5 * 60,
   });
@@ -93,7 +93,7 @@ const POST = async (
     id: params.id,
   });
 
-  const commentsResult = await db.collection("venets").find({
+  const commentsResult = await db.collection("events").find({
     kind: 1,
     "tags_map.e.0": params.id,
   }).toArray();
@@ -188,7 +188,7 @@ If no suitable texts are found, return an empty array.`,
         content: `Content: ${post.content}.`,
       },
       {
-        role: "user",
+        role: "assistant",
         content: `Existing comments: ${commentsString}.`,
       },
       {
