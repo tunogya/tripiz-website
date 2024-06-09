@@ -50,6 +50,12 @@ const POST = async (req: NextRequest) => {
     })
   }
 
+  if (content === "") {
+    return Response.json({
+      error: "content should not be empty",
+    })
+  }
+
   const isValid = verifyEvent({
     id,
     kind,
