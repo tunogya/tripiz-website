@@ -166,7 +166,7 @@ The user will write a reflection on their memories, dreams, or thoughts. Your ta
 3. Ensure the texts are authentic and not fictional.
 
 #### Return Format:
-If suitable texts are found, return a JSON array with each element containing:
+If suitable texts are found, use the user's language to respond and return a JSON array with each element containing:
 
 - \`"name"\`: The author or character of the text.
 - \`"text"\`: The text that resonates with the user's reflection.
