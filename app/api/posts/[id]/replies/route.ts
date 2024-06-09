@@ -186,7 +186,6 @@ If no suitable texts are found, return an empty array.`,
   const data = JSON.parse(reply)?.data || [];
 
   let eventsKind1 = [];
-  let eventsKind0Promise = [];
   for (let i = 0; i < data.length; i++) {
     const item = data[i];
 
@@ -201,7 +200,7 @@ If no suitable texts are found, return an empty array.`,
         picture: `https://www.larvalabs.com/cryptopunks/cryptopunk${randomNumber.toString().padStart(4, "0")}.png`,
       }),
     }, userSk);
-    eventsKind0Promise.push(db.collection("events").updateOne({
+    await db.collection("events").updateOne({
       kind: 0,
       pubkey: pubkey,
     }, {
@@ -215,7 +214,7 @@ If no suitable texts are found, return an empty array.`,
       },
     }, {
       upsert: true,
-    }));
+    });
     const eventComment = finalizeEvent({
       kind: 1,
       created_at: Math.floor(Date.now() / 1000),
@@ -227,11 +226,10 @@ If no suitable texts are found, return an empty array.`,
     eventsKind1.push({
       ...eventComment,
       tags_map: {
-        e: params.id,
+        e: [params.id],
       },
     });
   }
-  await Promise.all(eventsKind0Promise).catch((e) => console.log(e));
   await redis.del(`working:${params.id}`).catch((e) => console.log(e));
   const result = await db.collection("events").insertMany(eventsKind1);
   return Response.json(result);
