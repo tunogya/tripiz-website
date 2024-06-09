@@ -185,13 +185,15 @@ If no suitable texts are found, return an empty array.`,
       },
       {
         role: "user",
-        content: `#### User content: 
-${post.content}. 
-
-#### Existing comments: 
-${commentsString}. 
-
-Please provide new and unique responses.`,
+        content: `Content: ${post.content}.`,
+      },
+      {
+        role: "user",
+        content: `Existing comments: ${commentsString}. `,
+      },
+      {
+        role: "user",
+        content: `Please provide new and unique responses.`,
       },
     ],
     model: "gpt-4o",
