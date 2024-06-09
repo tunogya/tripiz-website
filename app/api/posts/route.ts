@@ -118,6 +118,9 @@ const POST = async (req: NextRequest) => {
     $vector,
   });
   if (result.insertedId) {
+    fetch(`https://tripiz.abandon.ai/api/posts/${id}/replies`, {
+      method: "POST",
+    });
     return Response.json({
       id: result.insertedId,
     });
