@@ -92,6 +92,14 @@ const POST = async (
   const post = await db.collection("events").findOne({
     id: params.id,
   });
+
+  const commentsResult = await db.collection("venets").find({
+    kind: 1,
+    "tags_map.e.0": params.id,
+  }).toArray();
+
+  const commentsString = commentsResult.map((item) => item.content).join("\n");
+
   if (!post) {
     return Response.json(
       {
@@ -150,31 +158,40 @@ const POST = async (
     messages: [
       {
         role: "system",
-        content: `#### User Requirement Description: 
+        content: `#### User Requirement Description:
+The user will write a reflection on their memories, dreams, or thoughts. Your task is to:
 
-The user will write a reflection, with the theme being their memories, dreams, or thoughts. Your task is:
+1. Identify multiple historical texts that closely match the user's reflection and evoke emotional resonance.
+2. These texts can be quotes from historical figures or characters in literature.
+3. Ensure the texts are authentic and not fictional.
 
-1. Find multiple pieces of text from human civilization's history that closely match the user's reflection and can evoke an emotional resonance.
-2. These texts can be real quotes from a historical figure or words spoken by a character in a book.
-3. Ensure that the texts are authentic and not fictional.
+#### Return Format:
+If suitable texts are found, return a JSON array with each element containing:
 
-#### Return Format: 
-
-If you find suitable texts, return a JSON array where each element contains the following fields:
-
-- \`"name"\`: The author of the text or the character who said it.
+- \`"name"\`: The author or character of the text.
 - \`"text"\`: The text that resonates with the user's reflection.
 
-For example:
+Example:
 \`\`\`json
-{"data": ["name":"Li Bai","text":"Heaven has endowed me with talents, and they will be put to good use. Wealth may be scattered, but it will return."},{"name":"Marcus Aurelius","text":"The happiness of your life depends upon the quality of your thoughts."}]}
+{
+  "data": [
+  {"name": "Li Bai", "text": "Heaven has endowed me with talents, and they will be put to good use. Wealth may be scattered, but it will return."},
+  {"name": "Marcus Aurelius", "text": "The happiness of your life depends upon the quality of your thoughts."}
+]
+}
 \`\`\`
 
 If no suitable texts are found, return an empty array.`,
       },
       {
         role: "user",
-        content: post.content,
+        content: `#### User content: 
+${post.content}. 
+
+#### Existing comments: 
+${commentsString}. 
+
+Please provide new and unique responses.`,
       },
     ],
     model: "gpt-4o",
