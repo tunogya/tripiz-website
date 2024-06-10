@@ -178,38 +178,47 @@ If no suitable texts are found, return an empty array.`
 
     let userSk = generateSecretKey(salt, item.name.toLowerCase()); // `sk` is a Uint8Array
     const userPubkey = getPublicKey(userSk);
-    const randomNumber = Math.floor(Math.random() * 10000);
-    const eventUserInfo = finalizeEvent(
-      {
-        kind: 0,
-        created_at: Math.floor(Date.now() / 1000),
-        tags: [],
-        content: JSON.stringify({
-          name: item.name,
-          picture: `https://www.larvalabs.com/cryptopunks/cryptopunk${randomNumber.toString().padStart(4, "0")}.png`,
-        }),
-      },
-      userSk,
-    );
-    await db.collection("events").updateOne(
-      {
-        kind: 0,
-        pubkey: userPubkey,
-      },
-      {
-        $set: {
-          id: eventUserInfo.id,
-          kind: eventUserInfo.kind,
-          content: eventUserInfo.content,
-          tags: eventUserInfo.tags,
-          sig: eventUserInfo.sig,
-          created_at: eventUserInfo.created_at,
+
+    const exist = await db.collection("events").findOne({
+      kind: 0,
+      pubkey: userPubkey,
+    });
+
+    if (!exist) {
+      const randomNumber = Math.floor(Math.random() * 10000);
+      const eventUserInfo = finalizeEvent(
+        {
+          kind: 0,
+          created_at: Math.floor(Date.now() / 1000),
+          tags: [],
+          content: JSON.stringify({
+            name: item.name,
+            picture: `https://www.larvalabs.com/cryptopunks/cryptopunk${randomNumber.toString().padStart(4, "0")}.png`,
+          }),
         },
-      },
-      {
-        upsert: true,
-      },
-    );
+        userSk,
+      );
+      await db.collection("events").updateOne(
+        {
+          kind: 0,
+          pubkey: userPubkey,
+        },
+        {
+          $set: {
+            id: eventUserInfo.id,
+            kind: eventUserInfo.kind,
+            content: eventUserInfo.content,
+            tags: eventUserInfo.tags,
+            sig: eventUserInfo.sig,
+            created_at: eventUserInfo.created_at,
+          },
+        },
+        {
+          upsert: true,
+        },
+      );
+    }
+
     const tags = [["e", params.id]];
     const eventComment = finalizeEvent(
       {
