@@ -10,6 +10,7 @@
     "prettier": "prettier . --write"
   },
   "dependencies": {
+    "@aws-sdk/client-sns": "^3.592.0",
     "@datastax/astra-db-ts": "^1.1.0",
     "@noble/hashes": "^1.4.0",
     "@types/bn.js": "^5.1.5",

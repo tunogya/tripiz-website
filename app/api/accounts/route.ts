@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
-import { connectToDatabase } from "@/utils/astradb";
 import { verifyEvent } from "nostr-tools/pure";
+import snsClient from "@/utils/snsClient";
+import {PublishCommand} from "@aws-sdk/client-sns";
 
 const POST = async (req: NextRequest) => {
   const { id, kind, pubkey, created_at, content, tags, sig } = await req.json();
@@ -32,33 +33,21 @@ const POST = async (req: NextRequest) => {
     );
   }
 
-  const { db } = await connectToDatabase();
-
-  const result = await db.collection("events").updateOne(
-    {
-      kind: 0,
-      pubkey: pubkey,
-    },
-    {
-      $set: {
+  try {
+    const message = await snsClient.send(new PublishCommand({
+      TopicArn: process.env.NOSTR_SNS_ARN,
+      Message: JSON.stringify({
         id,
         kind,
+        pubkey,
+        created_at,
         content,
         tags,
         sig,
-        created_at,
-      },
-    },
-    {
-      upsert: true,
-    },
-  );
-
-  if (result.upsertedId) {
-    return Response.json({
-      id: result.upsertedId,
-    });
-  } else {
+      }),
+    }));
+    return Response.json(message);
+  } catch (e) {
     return Response.json({
       error: "Something went wrong",
     });

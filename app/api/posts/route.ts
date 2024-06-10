@@ -1,9 +1,8 @@
 import { NextRequest } from "next/server";
 import { connectToDatabase } from "@/utils/astradb";
-import { embedding } from "@/utils/embedding";
-import openai from "@/utils/openai";
-import { convertTagsToDict } from "@/utils/convertTagsToDict";
 import { verifyEvent } from "nostr-tools/pure";
+import snsClient from "@/utils/snsClient";
+import {PublishCommand} from "@aws-sdk/client-sns";
 
 const GET = async (req: NextRequest) => {
   const ids =
@@ -87,41 +86,21 @@ const POST = async (req: NextRequest) => {
     );
   }
 
-  let $vector: number[] = [],
-    possibly_sensitive = false;
-
   try {
-    const [vector, moderation] = await Promise.all([
-      embedding(content),
-      openai.moderations.create({
-        input: content,
+    const message = await snsClient.send(new PublishCommand({
+      TopicArn: process.env.NOSTR_SNS_ARN,
+      Message: JSON.stringify({
+        id,
+        kind,
+        pubkey,
+        created_at,
+        content,
+        tags,
+        sig,
       }),
-    ]);
-    $vector = vector;
-    possibly_sensitive = moderation.results[0].flagged;
+    }));
+    return Response.json(message);
   } catch (e) {
-    console.log(e);
-  }
-
-  const { db } = await connectToDatabase();
-
-  const result = await db.collection("events").insertOne({
-    id,
-    kind,
-    pubkey,
-    content,
-    tags,
-    sig,
-    possibly_sensitive,
-    created_at,
-    tags_map: convertTagsToDict(tags),
-    $vector,
-  });
-  if (result.insertedId) {
-    return Response.json({
-      id: result.insertedId,
-    });
-  } else {
     return Response.json({
       error: "Something went wrong",
     });
