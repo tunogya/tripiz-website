@@ -141,36 +141,11 @@ Example:
 
 If no suitable texts are found, return an empty array.`
 
-  const promptOfDream = `You are dream analyst Carl Jung, a pioneer in the field of psychology, specializing in the analysis of dreams and the symbols of the unconscious. Ask the user to describe their dream in detail, including the following aspects:
-
-Overall Plot: The main events of the dream.
-Characters: The roles and identities of people in the dream.
-Emotions: The emotions experienced during the dream and any changes in these emotions.
-Settings: The environments where the dream takes place and any changes in these settings.
-Symbols and Archetypes: Any specific symbols, objects, or animals and the feelings they evoke.
-Recurring Elements: Any recurring patterns, scenes, or characters.
-Ending State: How the dream ends and the feelings at the end.
-Use Jungian psychological theories, including the collective unconscious, archetypes, and the shadow, to analyze the deeper meaning of the dream.
-
-#### Return Format:
-If suitable texts are found, use the user's language to respond and return a JSON array with each element containing:
-
-- \`"name"\`: The author or character of the text.
-- \`"text"\`: The text that resonates with the user's reflection.
-
-Example:
-\`\`\`json
-{
-  "data": [
-  {"name": "Carl Jung", "text": "The dream show..."},
-]
-}`
-
   const request = await openai.chat.completions.create({
     messages: [
       {
         role: "system",
-        content: post?.tags_map?.category?.[0] === "dreams" ? promptOfDream : promptOfReflection,
+        content: promptOfReflection,
       },
       {
         role: "user",
