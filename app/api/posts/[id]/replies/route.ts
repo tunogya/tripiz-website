@@ -6,8 +6,6 @@ import { finalizeEvent, getPublicKey } from "nostr-tools/pure";
 import { generateSecretKey } from "@/utils/generateSecretKey";
 import { convertTagsToDict } from "@/utils/convertTagsToDict";
 
-const revenuecat_proj_id = process.env.REVENUECAT_PROJECT_ID;
-const revenuecat_entitlement_id = process.env.REVENUECAT_ENTITLEMENT_ID;
 const salt = process.env.SALT || "0";
 
 const GET = async (
@@ -94,13 +92,6 @@ const POST = async (
     id: params.id,
   });
 
-  const commentsResult = await db.collection("events").find({
-    kind: 1,
-    "tags_map.e.0": params.id,
-  }).toArray();
-
-  const commentsString = commentsResult.map((item) => item.content).join("\n");
-
   if (!post) {
     return Response.json(
       {
@@ -124,41 +115,8 @@ const POST = async (
       },
     );
   }
-  //
-  // let isValid = await redis.get(`${pubkey}:${revenuecat_entitlement_id}`);
-  //
-  // if (!isValid) {
-  //   try {
-  //     const subscriptions = await fetch(`https://api.revenuecat.com/v2/projects/${revenuecat_proj_id}/customers/${pubkey}/subscriptions?environment=production`)
-  //       .then((res) => res.json());
-  //
-  //     isValid = subscriptions.items.some((item: any) => {
-  //       return item.gives_access === true
-  //         && item.current_period_ends_at > Date.now()
-  //         && item.entitlements.items.some((e_item: any) => e_item.id === revenuecat_entitlement_id);
-  //     })
-  //     await redis.set(`${pubkey}:${revenuecat_entitlement_id}`, true, {
-  //       ex: 4 * 60 * 60, // 4h
-  //     })
-  //   } catch (e) {
-  //     console.log(e)
-  //   }
-  // }
 
-  // if (!isValid) {
-  //   await redis.del(`working:${params.id}`).catch((e) => console.log(e));
-  //   return Response.json({
-  //     error: "Subscription not found",
-  //   }, {
-  //     status: 403,
-  //   });
-  // }
-
-  const request = await openai.chat.completions.create({
-    messages: [
-      {
-        role: "system",
-        content: `#### User Requirement Description:
+  const promptOfReflection = `#### User Requirement Description:
 The user will write a reflection on their memories, dreams, or thoughts. Your task is to:
 
 1. Identify multiple historical texts that closely match the user's reflection and evoke emotional resonance.
@@ -181,7 +139,38 @@ Example:
 }
 \`\`\`
 
-If no suitable texts are found, return an empty array.`,
+If no suitable texts are found, return an empty array.`
+
+  const promptOfDream = `You are dream analyst Carl Jung, a pioneer in the field of psychology, specializing in the analysis of dreams and the symbols of the unconscious. Ask the user to describe their dream in detail, including the following aspects:
+
+Overall Plot: The main events of the dream.
+Characters: The roles and identities of people in the dream.
+Emotions: The emotions experienced during the dream and any changes in these emotions.
+Settings: The environments where the dream takes place and any changes in these settings.
+Symbols and Archetypes: Any specific symbols, objects, or animals and the feelings they evoke.
+Recurring Elements: Any recurring patterns, scenes, or characters.
+Ending State: How the dream ends and the feelings at the end.
+Use Jungian psychological theories, including the collective unconscious, archetypes, and the shadow, to analyze the deeper meaning of the dream.
+
+#### Return Format:
+If suitable texts are found, use the user's language to respond and return a JSON array with each element containing:
+
+- \`"name"\`: The author or character of the text.
+- \`"text"\`: The text that resonates with the user's reflection.
+
+Example:
+\`\`\`json
+{
+  "data": [
+  {"name": "Carl Jung", "text": "The dream show..."},
+]
+}`
+
+  const request = await openai.chat.completions.create({
+    messages: [
+      {
+        role: "system",
+        content: post?.tags_map?.category?.[0] === "dreams" ? promptOfDream : promptOfReflection,
       },
       {
         role: "user",
