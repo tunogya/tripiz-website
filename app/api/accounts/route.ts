@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { verifyEvent } from "nostr-tools/pure";
 import snsClient from "@/utils/snsClient";
-import {PublishCommand} from "@aws-sdk/client-sns";
+import { PublishCommand } from "@aws-sdk/client-sns";
 
 const POST = async (req: NextRequest) => {
   const { id, kind, pubkey, created_at, content, tags, sig } = await req.json();
@@ -34,18 +34,20 @@ const POST = async (req: NextRequest) => {
   }
 
   try {
-    const message = await snsClient.send(new PublishCommand({
-      TopicArn: process.env.NOSTR_SNS_ARN,
-      Message: JSON.stringify({
-        id,
-        kind,
-        pubkey,
-        created_at,
-        content,
-        tags,
-        sig,
+    const message = await snsClient.send(
+      new PublishCommand({
+        TopicArn: process.env.NOSTR_SNS_ARN,
+        Message: JSON.stringify({
+          id,
+          kind,
+          pubkey,
+          created_at,
+          content,
+          tags,
+          sig,
+        }),
       }),
-    }));
+    );
     return Response.json(message);
   } catch (e) {
     return Response.json({

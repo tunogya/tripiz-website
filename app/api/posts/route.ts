@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { connectToDatabase } from "@/utils/astradb";
 import { verifyEvent } from "nostr-tools/pure";
 import snsClient from "@/utils/snsClient";
-import {PublishCommand} from "@aws-sdk/client-sns";
+import { PublishCommand } from "@aws-sdk/client-sns";
 
 const GET = async (req: NextRequest) => {
   const ids =
@@ -87,26 +87,31 @@ const POST = async (req: NextRequest) => {
   }
 
   try {
-    const category = tags.find((tag: any[]) => tag[0] === "category")?.[1] || undefined;
-    const message = await snsClient.send(new PublishCommand({
-      TopicArn: process.env.NOSTR_SNS_ARN,
-      Message: JSON.stringify({
-        id,
-        kind,
-        pubkey,
-        created_at,
-        content,
-        tags,
-        sig,
-      }),
-      MessageAttributes: {
-        kind: {
-          DataType: "Number",
-          StringValue: kind.toString(),
+    const category =
+      tags.find((tag: any[]) => tag[0] === "category")?.[1] || undefined;
+    const message = await snsClient.send(
+      new PublishCommand({
+        TopicArn: process.env.NOSTR_SNS_ARN,
+        Message: JSON.stringify({
+          id,
+          kind,
+          pubkey,
+          created_at,
+          content,
+          tags,
+          sig,
+        }),
+        MessageAttributes: {
+          kind: {
+            DataType: "Number",
+            StringValue: kind.toString(),
+          },
+          ...(category && {
+            category: { DataType: "String", StringValue: category },
+          }),
         },
-        ...(category && { category: { DataType: "String", StringValue: category } }),
-      },
-    }));
+      }),
+    );
     return Response.json(message);
   } catch (e) {
     return Response.json({

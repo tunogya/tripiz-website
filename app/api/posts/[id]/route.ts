@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectToDatabase } from "@/utils/astradb";
+import { ddbDocClient } from "@/utils/ddbDocClient";
+import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 
 const GET = async (
   req: NextRequest,
@@ -38,7 +40,27 @@ const DELETE = async (
 
   const doc = await db.collection("events").findOne({
     id: id,
-  })
+  });
+
+  try {
+    await ddbDocClient.send(
+      new UpdateCommand({
+        TableName: "events",
+        Key: {
+          id: id,
+        },
+        UpdateExpression: "set #deleted_at = :deleted_at",
+        ExpressionAttributeNames: {
+          "#deleted_at": "deleted_at",
+        },
+        ExpressionAttributeValues: {
+          ":deleted_at": Math.floor(Date.now() / 1000) + 86400 * 30,
+        },
+      }),
+    );
+  } catch (e) {
+    console.log(e);
+  }
 
   if (!doc) {
     return Response.json({
@@ -49,9 +71,9 @@ const DELETE = async (
   try {
     await db.collection("events").deleteOne({
       id: id,
-    })
+    });
   } catch (e) {
-    console.log(e)
+    console.log(e);
     return Response.json({
       error: "Something went wrong",
     });
