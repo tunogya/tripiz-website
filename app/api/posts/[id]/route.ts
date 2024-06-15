@@ -34,13 +34,30 @@ const DELETE = async (
   { params }: { params: { id: string } },
 ) => {
   const id = params.id;
-  const { db } = await connectToDatabase();
+  const { db, client } = await connectToDatabase();
 
-  const result = await db.collection("events").deleteOne({
+  const doc = await db.collection("events").findOne({
     id: id,
-  });
+  })
 
-  if (!result.deletedCount) {
+  if (!doc) {
+    return Response.json({
+      error: "404",
+    });
+  }
+
+  try {
+    await Promise.all([
+      db.collection("recycle").insertOne({
+        ...doc,
+        deleted_at: Math.floor(Date.now() / 1000),
+      }),
+      db.collection("events").deleteOne({
+        id: id,
+      }),
+    ]);
+  } catch (e) {
+    console.log(e)
     return Response.json({
       error: "Something went wrong",
     });
