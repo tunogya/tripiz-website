@@ -34,7 +34,7 @@ const DELETE = async (
   { params }: { params: { id: string } },
 ) => {
   const id = params.id;
-  const { db, client } = await connectToDatabase();
+  const { db } = await connectToDatabase();
 
   const doc = await db.collection("events").findOne({
     id: id,
@@ -47,15 +47,9 @@ const DELETE = async (
   }
 
   try {
-    await Promise.all([
-      db.collection("recycle").insertOne({
-        ...doc,
-        deleted_at: Math.floor(Date.now() / 1000),
-      }),
-      db.collection("events").deleteOne({
-        id: id,
-      }),
-    ]);
+    await db.collection("events").deleteOne({
+      id: id,
+    })
   } catch (e) {
     console.log(e)
     return Response.json({
