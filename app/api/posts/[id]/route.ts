@@ -36,8 +36,16 @@ const DELETE = async (
   const id = params.id;
   const { db } = await connectToDatabase();
 
-  const result = await db.collection("events").deleteOne({
-    id: id,
+  const result = await db.collection("events").deleteMany({
+    $or: [
+      {
+        id: id,
+      },
+      {
+        kind: 1,
+        "tags_map.e.0": id,
+      }
+    ]
   });
 
   if (!result.deletedCount) {
