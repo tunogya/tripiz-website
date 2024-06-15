@@ -36,7 +36,7 @@ const DELETE = async (
   const id = params.id;
   const { db } = await connectToDatabase();
 
-  const result = await db.collection("events").deleteMany({
+  const result = await db.collection("events").deleteOne({
     id: id,
   });
 
