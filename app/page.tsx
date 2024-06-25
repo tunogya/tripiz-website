@@ -1,8 +1,8 @@
-import {fetchUsers} from "@/app/lib/data";
+import {fetchLatestUsers} from "@/app/lib/data";
 import UserCard from "@/app/components/UserCard";
 
 export default async function Home() {
-  const users = await fetchUsers();
+  const users = await fetchLatestUsers();
 
   return (
     <div className={"flex flex-row p-2 h-screen w-screen overflow-hidden space-x-2"}>
@@ -18,51 +18,31 @@ export default async function Home() {
               Tripiz
             </div>
           </div>
-          {/*<div className={"flex flex-row items-center space-x-5"}>*/}
-          {/*  <svg data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 24 24" width={"24"} height={"24"} fill={"white"}>*/}
-          {/*    <path*/}
-          {/*      d="M12.5 3.247a1 1 0 0 0-1 0L4 7.577V20h4.5v-6a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v6H20V7.577l-7.5-4.33zm-2-1.732a3 3 0 0 1 3 0l7.5 4.33a2 2 0 0 1 1 1.732V21a1 1 0 0 1-1 1h-6.5a1 1 0 0 1-1-1v-6h-3v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.577a2 2 0 0 1 1-1.732l7.5-4.33z"></path>*/}
-          {/*  </svg>*/}
-          {/*  <div className={"font-medium"}>*/}
-          {/*    主页*/}
-          {/*  </div>*/}
-          {/*</div>*/}
-          {/*<div className={"flex flex-row items-center space-x-5"}>*/}
-          {/*  <svg data-encore-id="icon" role="img" aria-hidden="true" viewBox="0 0 24 24" width={"24"} height={"24"} fill={"white"}>*/}
-          {/*    <path*/}
-          {/*      d="M15.356 10.558c0 2.623-2.16 4.75-4.823 4.75-2.664 0-4.824-2.127-4.824-4.75s2.16-4.75 4.824-4.75c2.664 0 4.823 2.127 4.823 4.75z"></path>*/}
-          {/*    <path*/}
-          {/*      d="M1.126 10.558c0-5.14 4.226-9.28 9.407-9.28 5.18 0 9.407 4.14 9.407 9.28a9.157 9.157 0 0 1-2.077 5.816l4.344 4.344a1 1 0 0 1-1.414 1.414l-4.353-4.353a9.454 9.454 0 0 1-5.907 2.058c-5.18 0-9.407-4.14-9.407-9.28zm9.407-7.28c-4.105 0-7.407 3.274-7.407 7.28s3.302 7.279 7.407 7.279 7.407-3.273 7.407-7.28c0-4.005-3.302-7.278-7.407-7.278z"></path>*/}
-          {/*  </svg>*/}
-          {/*  <div className={"font-medium"}>*/}
-          {/*    搜索*/}
-          {/*  </div>*/}
-          {/*</div>*/}
         </div>
         <div className={"bg-[#121212] w-[400px] flex-1 rounded-lg px-6 py-5"}>
           <div className={"text-[#B3B3B3] font-medium"}>Friends</div>
         </div>
       </div>
-      <div className={"flex-1"}>
+      <div className={"w-[calc(100%-412px)]"}>
         <div className={"bg-[#121212] h-full rounded-lg"}>
           <div
-            className={"sticky bg-[#000000] px-6 py-2 rounded-t-lg flex flex-row items-center justify-between"}>
+            className={"sticky top-0 bg-[#000000] px-6 py-2 rounded-t-lg flex flex-row items-center justify-between"}>
             <div></div>
             <button className={"text-black font-medium bg-white px-6 py-2 rounded-full"}>
               Login
             </button>
           </div>
-          <div className={"flex space-y-3"}>
-            <div className={"px-6 py-5 space-y-3"}>
-              <div className={"text-[#B3B3B3] font-medium"}>Users</div>
-              <div className={"flex flex-row space-x-3 relative"}>
-                <div className={"flex flex-row bg-red-500 overflow-scroll"}>
-                  {
-                    users.map((item) => (
-                      <UserCard item={item} key={item.id} />
-                    ))
-                  }
-                </div>
+          <div className={"py-5 space-y-3"}>
+            <div className={"text-[#B3B3B3] font-medium px-6"}>Latest Users</div>
+            <div className={"flex-1 overflow-auto"}>
+              <div className={"flex flex-row space-x-3"}>
+                <div className={"w-6"}></div>
+                {
+                  users.map((item) => (
+                    <UserCard item={item} key={item.id}/>
+                  ))
+                }
+                <div className={"w-6"}></div>
               </div>
             </div>
           </div>
