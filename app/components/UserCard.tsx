@@ -41,7 +41,7 @@ const UserCard = ({item}: any) => {
             </div>
           ) : (
             <div>
-              <div className={"text-white text-sm truncate"}>{encodeKey("npub", item.pubkey.substring(2))}</div>
+              <div className={"text-white text-sm truncate"}>{encodeKey("npub", item.pubkey)}</div>
               <div className={"text-[#B3B3B3] text-sm"}>Human</div>
             </div>
           )
