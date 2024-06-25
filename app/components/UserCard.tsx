@@ -1,6 +1,7 @@
 "use client";
 import {useEffect, useState} from "react";
 import Image from "next/image";
+import {encodeKey} from "@/app/lib/nostr";
 
 const UserCard = ({item}: any) => {
   const [picture, setPicture] = useState(undefined);
@@ -40,7 +41,7 @@ const UserCard = ({item}: any) => {
             </div>
           ) : (
             <div>
-              <div className={"text-white text-sm truncate"}>-</div>
+              <div className={"text-white text-sm truncate"}>{encodeKey("npub", item.pubkey.substring(2))}</div>
               <div className={"text-[#B3B3B3] text-sm"}>Human</div>
             </div>
           )
