@@ -1,4 +1,9 @@
-export default function Home() {
+import {fetchUsers} from "@/app/lib/data";
+import UserCard from "@/app/components/UserCard";
+
+export default async function Home() {
+  const users = await fetchUsers();
+
   return (
     <div className={"flex flex-row p-2 h-screen w-screen overflow-hidden space-x-2"}>
       <div className={"space-y-2 flex flex-col"}>
@@ -39,12 +44,27 @@ export default function Home() {
         </div>
       </div>
       <div className={"flex-1"}>
-        <div className={"bg-[#121212] w-full h-full rounded-lg relative overflow-scroll"}>
-          <div className={"absolute top-0 left-0 bg-[#000000] w-full px-6 py-2 rounded-t-lg flex flex-row items-center justify-between"}>
+        <div className={"bg-[#121212] h-full rounded-lg"}>
+          <div
+            className={"sticky bg-[#000000] px-6 py-2 rounded-t-lg flex flex-row items-center justify-between"}>
             <div></div>
             <button className={"text-black font-medium bg-white px-6 py-2 rounded-full"}>
               Login
             </button>
+          </div>
+          <div className={"flex space-y-3"}>
+            <div className={"px-6 py-5 space-y-3"}>
+              <div className={"text-[#B3B3B3] font-medium"}>Users</div>
+              <div className={"flex flex-row space-x-3 relative"}>
+                <div className={"flex flex-row bg-red-500 overflow-scroll"}>
+                  {
+                    users.map((item) => (
+                      <UserCard item={item} key={item.id} />
+                    ))
+                  }
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
