@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { connectToDatabase } from "@/utils/astradb";
+import redis from "@/utils/redis";
 
 const GET = async (
   req: NextRequest,
@@ -16,6 +17,15 @@ const GET = async (
         status: 400,
       },
     );
+  }
+
+  const cache = await redis.get(`category:${key}:${params.pubkey}`);
+
+  if (cache) {
+    return Response.json({
+      data: cache,
+      cached: true,
+    });
   }
 
   const { db } = await connectToDatabase();
@@ -40,7 +50,13 @@ const GET = async (
     return acc;
   }, {});
 
-  return Response.json(grouped);
+  await redis.set(`category:${key}:${params.pubkey}`, JSON.stringify(grouped), {
+    ex: 60 * 60,
+  });
+
+  return Response.json({
+    data: grouped,
+  });
 };
 
 export { GET };
