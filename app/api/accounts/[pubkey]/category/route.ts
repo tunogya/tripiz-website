@@ -22,10 +22,7 @@ const GET = async (
   const cache = await redis.get(`category:${key}:${params.pubkey}`);
 
   if (cache) {
-    return Response.json({
-      data: cache,
-      cached: true,
-    });
+    return Response.json(cache);
   }
 
   const { db } = await connectToDatabase();
@@ -54,9 +51,7 @@ const GET = async (
     ex: 60 * 60,
   });
 
-  return Response.json({
-    data: grouped,
-  });
+  return Response.json(grouped);
 };
 
 export { GET };
