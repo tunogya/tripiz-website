@@ -48,7 +48,7 @@ const GET = async (
   }, {});
 
   await redis.set(`category:${key}:${params.pubkey}`, JSON.stringify(grouped), {
-    ex: 60 * 60,
+    ex: 60,
   });
 
   return Response.json(grouped);
