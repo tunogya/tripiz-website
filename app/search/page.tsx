@@ -1,7 +1,7 @@
 const Page = () => {
     return (
-        <div>
-
+        <div className="px-6">
+            Search Index
         </div>
     )
 }

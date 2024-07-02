@@ -1,11 +1,23 @@
-import { FC } from "react"
+import { usePathname, useRouter } from "next/navigation";
+import { FC, useEffect, useState } from "react"
 
 const NavigationBar: FC<{
-    scrolled: boolean
-}> = ({scrolled}) => {
-    return (
-        <div
-        className={`sticky top-0 h-[64px] ${scrolled ? "bg-[#121212]" : "bg-[#00000033]"} rounded-t-lg flex flex-row items-center justify-between pl-4 pr-8`}>
+  scrolled: boolean
+}> = ({ scrolled }) => {
+  const [text, setText] = useState("");
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (!pathname.startsWith("/search")) {
+      setText("");
+    }
+  }, [pathname]);
+
+  return (
+    <div
+      className={`sticky top-0 h-[64px] ${scrolled ? "bg-[#121212]" : "bg-[#00000033]"} rounded-t-lg flex flex-row items-center justify-between pl-4 pr-8`}>
+      <div className="flex flex-row items-center space-x-4">
         <div className="flex flex-row space-x-2">
           <button className="h-8 w-8 rounded-full bg-[#000000B3] flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
@@ -18,11 +30,25 @@ const NavigationBar: FC<{
             </svg>
           </button>
         </div>
-        <button className={"text-black font-medium bg-white h-[48px] py-2 px-8 rounded-full"}>
-          Login
-        </button>
+        {
+          pathname?.startsWith("/search") && (
+            <input
+              type="text"
+              value={text}
+              onChange={(e) => {
+                setText(e.target.value)
+                router.push(`/search/${e.target.value}`)
+              }}
+              className="h-[48px] w-[365px] rounded-full bg-[#242424] text-white px-4 outline-none focus:outline-none focus:ring-2 focus:ring-white"
+            />
+          )
+        }
       </div>
-    )
+      <button className={"text-black font-medium bg-white h-[48px] py-2 px-8 rounded-full"}>
+        Login
+      </button>
+    </div>
+  )
 }
 
 export default NavigationBar
