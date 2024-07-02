@@ -87,7 +87,7 @@ export default function RootLayout({
               </div>
               {
                 MENU.map((item) => (
-                  <Link href={`/${item.path}`}
+                  <Link href={`/${item.path}`} prefetch
                     className={`flex flex-row items-center space-x-5 ${pathname.split("/")[1] === item.path ? "text-white" : "text-[#B3B3B3]"}`} key={item.path}>
                     {
                       pathname.split("/")[1] === item.path ? item.selectedIcon : item.icon
