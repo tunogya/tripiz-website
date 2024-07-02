@@ -23,13 +23,13 @@ const UserCard = ({item}: any) => {
   }, [item]);
 
   return (
-    <div key={item.id} className={"w-[200px] shrink-0 py-4"}>
+    <div key={item.id} className={"w-full shrink-0 p-3 group"}>
       <div className={"text-white space-y-2"}>
         {
           picture ? (
-            <Image src={picture} alt={""} width={200} height={200} className={"rounded-full"}/>
+            <Image src={picture} alt={""} width={240} height={240} className={"rounded-full group-hover:border-4 border-white hover:cursor-pointer"}/>
           ) : (
-            <div className={"w-50 h-50 bg-[#B3B3B3]"}>
+            <div className={"w-60 h-60 bg-[#B3B3B3]"}>
             </div>
           )
         }

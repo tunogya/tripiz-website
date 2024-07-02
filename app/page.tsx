@@ -5,9 +5,9 @@ export default async function Home() {
   const users = await fetchLatestUsers();
 
   return (
-    <div className={"flex flex-row p-2 h-screen w-screen overflow-hidden space-x-2"}>
-      <div className={"space-y-2 flex flex-col"}>
-        <div className={"bg-[#121212] w-[400px] rounded-lg px-6 py-5 space-y-5"}>
+    <div className={"flex flex-row h-screen w-screen p-2 space-x-2"}>
+      <div className={"space-y-2 flex flex-col w-[400px]"}>
+        <div className={"bg-[#121212] w-full rounded-lg px-6 py-5 space-y-5"}>
           <div className={"flex flex-row items-center space-x-1"}>
             <svg width="24" height="24" viewBox="0 0 760 696" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -19,30 +19,30 @@ export default async function Home() {
             </div>
           </div>
         </div>
-        <div className={"bg-[#121212] w-[400px] flex-1 rounded-lg px-6 py-5"}>
+        <div className={"bg-[#121212] w-full flex-1 rounded-lg px-6 py-5"}>
           <div className={"text-[#B3B3B3] font-medium"}>Friends</div>
         </div>
       </div>
-      <div className={"w-[calc(100%-412px)]"}>
-        <div className={"bg-[#121212] h-full rounded-lg"}>
+      <div className={"w-[calc(100%-408px)] overflow-y-scroll"}>
+        <div className={"rounded-lg bg-[#121212] h-full overflow-scroll"}>
           <div
-            className={"sticky top-0 bg-[#000000] px-6 py-2 rounded-t-lg flex flex-row items-center justify-between"}>
+            className={"sticky top-0 h-[64px] bg-black rounded-t-lg flex flex-row items-center justify-between px-8"}>
             <div></div>
-            <button className={"text-black font-medium bg-white px-6 py-2 rounded-full"}>
+            <button className={"text-black font-medium bg-white h-[56px] py-2 px-8 rounded-full"}>
               Login
             </button>
           </div>
           <div className={"py-5 space-y-3"}>
-            <div className={"text-[#B3B3B3] font-medium px-6"}>Latest Users</div>
+            <div className={"text-white text-2xl font-medium px-6"}>Latest Users</div>
             <div className={"flex-1 overflow-auto"}>
-              <div className={"flex flex-row space-x-3"}>
-                <div className={"w-6"}></div>
-                {
+              <div className={"flex flex-row"}>
+              <div className="grid grid-cols-6 p-3">
+              {
                   users.map((item) => (
                     <UserCard item={item} key={item.id}/>
                   ))
                 }
-                <div className={"w-6"}></div>
+              </div>
               </div>
             </div>
           </div>
