@@ -53,10 +53,10 @@ const NavigationBar: FC<{
         }
       </div>
       <div className="flex flex-row items-center space-x-4">
-        <button className="text-[#A7A7A7] px-4 py-2 font-medium">
+        <button className="text-[#A7A7A7] px-4 py-2 font-medium hover:text-white hover:scale-105">
           Register
         </button>
-        <button className={"text-black font-medium bg-white h-[48px] py-2 px-8 rounded-full"}>
+        <button className={"text-black font-medium bg-white h-[48px] py-2 px-8 rounded-full hover:scale-105"}>
           Login
         </button>
       </div>
