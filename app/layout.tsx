@@ -29,7 +29,6 @@ export default function RootLayout({
     // @ts-ignore
     scrollRef.current?.addEventListener('scroll', handleScroll);
 
-    // 清理事件监听器
     return () => {
       // @ts-ignore
       scrollRef.current?.removeEventListener('scroll', handleScroll);
