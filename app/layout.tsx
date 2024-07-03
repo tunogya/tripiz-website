@@ -7,10 +7,6 @@ import Chats from "./components/Chats";
 import NavigationBar from "./components/NavigationBar";
 import { usePathname } from "next/navigation";
 import Link from 'next/link';
-// import { initDB } from "react-indexed-db-hook";
-// import { DBConfig } from "@/utils/DBConfig";
-
-// initDB(DBConfig);
 
 const inter = Inter({ subsets: ["latin"] });
 

@@ -1,18 +1,13 @@
 'use client';
 
-import { v4 as uuidv4 } from 'uuid';
 import { hexToBytes } from "@noble/hashes/utils";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { getPublicKey } from "nostr-tools";
 import { useEffect, useMemo, useState } from "react";
-// import { useWebSocket } from "../components/WebSocketProvider";
-import { useIndexedDB } from 'react-indexed-db-hook';
 import PostCard from '../components/PostCard';
 
 const Page = () => {
   const [skHex, setSkHex] = useLocalStorage("skHex", "");
-  const { openCursor } = useIndexedDB("events");
-  // const { send } = useWebSocket();
   const [filter, setFilter] = useState("");
   const [DATA, setDATA] = useState<any[]>([]);
   const [queried, setQueried] = useState(false);
@@ -21,37 +16,6 @@ const Page = () => {
     const sk = hexToBytes(skHex);
     return getPublicKey(sk);
   }, [skHex]);
-
-  useEffect(() => {
-    setQueried(false);
-    const query = async () => {
-      let result: any[] = [];
-      const openCursorAsync = () => {
-        return new Promise((resolve, reject) => {
-          openCursor((evt) => {
-            // @ts-ignore
-            var cursor = evt.target.result;
-            if (cursor) {
-              if (cursor.value.kind === 1 && cursor.value.pubkey === pubkey) {
-                result.push(cursor.value);
-              }
-              cursor.continue();
-            } else {
-              resolve(result); // 当游标遍历完毕时，解析 Promise
-            }
-          });
-        });
-      };
-
-      await openCursorAsync();
-
-      // 将results排序，created_at 降序
-      result = result.sort((a, b) => b.created_at - a.created_at);
-      setDATA(result);
-      setQueried(true);
-    }
-    query();
-  }, []);
 
   const filterData = useMemo(() => {
     if (filter) {
@@ -65,22 +29,6 @@ const Page = () => {
       return DATA;
     }
   }, [DATA, filter]);
-
-  // useEffect(() => {
-  //   if (!queried) {
-  //     return;
-  //   }
-  //   send(JSON.stringify([
-  //     "REQ",
-  //     uuidv4(),
-  //     {
-  //       authors: [pubkey],
-  //       kinds: [1],
-  //       since: filterData.length > 0 ? filterData[0].created_at : 0,
-  //       limit: 40,
-  //     },
-  //   ]));
-  // }, [pubkey, filterData, queried]);
 
   return (
     <div className="px-6">

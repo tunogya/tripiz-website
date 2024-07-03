@@ -6,8 +6,6 @@ import { generateSecretKey, getPublicKey } from 'nostr-tools/pure'
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import Link from "next/link";
-// import useUserInfo from "./useUserInfo";
-import Image from "next/image";
 
 const NavigationBar: FC<{
   scrolled: boolean
