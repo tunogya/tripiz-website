@@ -4,7 +4,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { FC, useEffect, useMemo, useState } from "react";
 import { generateSecretKey, getPublicKey } from 'nostr-tools/pure'
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import Link from "next/link";
 
 const NavigationBar: FC<{
@@ -13,15 +12,15 @@ const NavigationBar: FC<{
   const [text, setText] = useState("");
   const router = useRouter();
   const pathname = usePathname();
-  const [skHex, setSkHex] = useLocalStorage("skHex", "");
+  // const [skHex, setSkHex] = useLocalStorage("skHex");
 
-  const pubkey = useMemo(() => {
-    if (!skHex) {
-      return "";
-    }
-    const sk = hexToBytes(skHex);
-    return getPublicKey(sk);
-  }, [skHex]);
+  // const pubkey = useMemo(() => {
+  //   if (!skHex?.data) {
+  //     return "";
+  //   }
+  //   const sk = hexToBytes(skHex?.data);
+  //   return getPublicKey(sk);
+  // }, [skHex]);
 
   // const { picture } = useUserInfo(pubkey);
 
@@ -30,14 +29,14 @@ const NavigationBar: FC<{
     // let pk = getPublicKey(sk) // `pk` is a hex string
     let skHex = bytesToHex(sk)
     // let backToBytes = hexToBytes(skHex)
-    setSkHex(skHex);
+    // setSkHex({data: skHex});
   }
 
-  useEffect(() => {
-    if (!skHex) {
-      register();
-    }
-  }, [skHex]);
+  // useEffect(() => {
+  //   if (!skHex?.data) {
+  //     register();
+  //   }
+  // }, [skHex]);
 
   useEffect(() => {
     if (!pathname.startsWith("/search")) {

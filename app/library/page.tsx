@@ -1,21 +1,23 @@
 'use client';
 
 import { hexToBytes } from "@noble/hashes/utils";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import { getPublicKey } from "nostr-tools";
 import { useEffect, useMemo, useState } from "react";
 import PostCard from '../components/PostCard';
 
 const Page = () => {
-  const [skHex, setSkHex] = useLocalStorage("skHex", "");
+  // const [skHex, setSkHex] = useLocalStorage("skHex");
   const [filter, setFilter] = useState("");
   const [DATA, setDATA] = useState<any[]>([]);
   const [queried, setQueried] = useState(false);
 
-  const pubkey = useMemo(() => {
-    const sk = hexToBytes(skHex);
-    return getPublicKey(sk);
-  }, [skHex]);
+  // const pubkey = useMemo(() => {
+  //   if (!skHex?.data) {
+  //     return "";
+  //   }
+  //   const sk = hexToBytes(skHex?.data);
+  //   return getPublicKey(sk);
+  // }, [skHex]);
 
   const filterData = useMemo(() => {
     if (filter) {

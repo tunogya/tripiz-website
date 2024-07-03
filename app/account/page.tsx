@@ -2,31 +2,30 @@
 
 import { decodeKey, encodeKey } from "@/utils/nostrUtil";
 import { hexToBytes } from "@noble/hashes/utils";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import { getPublicKey } from "nostr-tools";
 import { useMemo, useState } from "react";
 import QRCode from "react-qr-code";
 
 const Page = () => {
-  const [skHex, setSkHex] = useLocalStorage("skHex", "");
+  // const [skHex, setSkHex] = useLocalStorage("skHex", {data: ""});
   const [input, setInput] = useState("");
   const [showInput, setShowInput] = useState(false);
 
-  const nostrPk = useMemo(() => {
-    if (!skHex) {
-      return null;
-    }
-    const sk = hexToBytes(skHex);
-    const pubkey = getPublicKey(sk);
-    return encodeKey("npub", pubkey);
-  }, [skHex]);
+  // const nostrPk = useMemo(() => {
+  //   if (!skHex.data) {
+  //     return null;
+  //   }
+  //   const sk = hexToBytes(skHex.data);
+  //   const pubkey = getPublicKey(sk);
+  //   return encodeKey("npub", pubkey);
+  // }, [skHex]);
 
-  const nostrSk = useMemo(() => {
-    if (!skHex) {
-      return null;
-    }
-    return encodeKey("nsec", skHex)
-  }, [skHex]);
+  // const nostrSk = useMemo(() => {
+  //   if (!skHex.data) {
+  //     return null;
+  //   }
+  //   return encodeKey("nsec", skHex.data)
+  // }, [skHex]);
 
   return (
     <div className="px-6">
@@ -39,7 +38,7 @@ const Page = () => {
             Public Key
           </div>
           <div className="text-[#B3B3B3] text-sm">
-            {nostrPk}
+            {/* {nostrPk} */}
           </div>
         </div>
         <div>
@@ -47,12 +46,12 @@ const Page = () => {
             Secret Key
           </div>
           <div className="text-[#B3B3B3] text-sm">
-            {nostrSk}
+            {/* {nostrSk} */}
           </div>
         </div>
         <div>
           <div className="p-2 bg-white w-fit space-y-2">
-            <QRCode value={nostrSk || ""} size={256} />
+            {/* <QRCode value={nostrSk || ""} size={256} /> */}
             <div className="text-black text-center font-medium text-sm">
               Nostr Secret Key
             </div>
@@ -88,7 +87,9 @@ const Page = () => {
                       if (!nostrPrivateKey) {
                         return;
                       }
-                      setSkHex(nostrPrivateKey);
+                      // setSkHex({
+                      //   data: nostrPrivateKey
+                      // });
                       setShowInput(false);
                       setInput("");
                     }}
