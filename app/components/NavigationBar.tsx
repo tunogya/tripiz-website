@@ -1,4 +1,5 @@
 'use client';
+
 import { usePathname, useRouter } from "next/navigation";
 import { FC, useEffect, useMemo, useState } from "react";
 import { generateSecretKey, getPublicKey } from 'nostr-tools/pure'

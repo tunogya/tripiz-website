@@ -1,3 +1,5 @@
+'use client';
+
 import { FC } from "react"
 
 const PostCard: FC<{ event: any }> = ({ event }) => {

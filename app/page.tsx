@@ -1,5 +1,6 @@
-export default async function Home() {
-  
+'use client';
+
+export default function Home() {
   return (
     <div>
       <div className={"text-white text-2xl font-medium px-6"}>Latest Users</div>

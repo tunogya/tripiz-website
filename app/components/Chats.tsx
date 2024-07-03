@@ -1,3 +1,5 @@
+'use client';
+
 const Chats = () => {
   return (
     <div className={"bg-[#121212] w-full flex-1 rounded-lg px-6 py-5"}>

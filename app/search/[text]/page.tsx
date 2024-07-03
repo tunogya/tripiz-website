@@ -1,3 +1,5 @@
+'use client';
+
 import { useRouter } from "next/router"
 
 const Page = ({ params }: { params: { text: string } }) => {
