@@ -43,13 +43,18 @@ const WebSocketProvider = ({ children }) => {
 
     // @ts-ignore
     ws.current.onclose = (e) => {
-      setConnected(false);
-      handleReconnection();
+      if (connected) {
+        setConnected(false);
+        handleReconnection();
+      }
     };
 
     // @ts-ignore
     ws.current.onerror = (e) => {
-      setConnected(false);
+      if (connected) {
+        setConnected(false);
+        handleReconnection();
+      }
     };
 
     // @ts-ignore
