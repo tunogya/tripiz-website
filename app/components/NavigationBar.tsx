@@ -1,9 +1,10 @@
+'use client';
 import { usePathname, useRouter } from "next/navigation";
-import { FC, useEffect, useMemo, useState } from "react";
-import { generateSecretKey, getPublicKey } from 'nostr-tools/pure'
-import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
+import { FC, useEffect, useState } from "react";
+import { generateSecretKey } from 'nostr-tools/pure'
+import { bytesToHex } from "@noble/hashes/utils";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { encodeKey } from "@/utils/nostrUtil";
+import Link from "next/link";
 
 const NavigationBar: FC<{
   scrolled: boolean
@@ -21,9 +22,10 @@ const NavigationBar: FC<{
     setSkHex(skHex);
   }
 
-  const nostrPk = useMemo(() => {
-    const sk = hexToBytes(skHex);
-    return encodeKey("npub", getPublicKey(sk).substring(2))
+  useEffect(() => {
+    if (!skHex) {
+      register();
+    }
   }, [skHex]);
 
   useEffect(() => {
@@ -77,35 +79,17 @@ const NavigationBar: FC<{
         }
       </div>
       <div className="flex flex-row items-center space-x-4">
-        {
-          skHex ? (
-            <>
-              <button className="text-white text-sm hover:scale-105 py-1 px-4 flex flex-row items-center space-x-1">
-                <svg data-encore-id="icon" fill="white" width={16} height={16} role="img" aria-hidden="true" viewBox="0 0 16 16"><path d="M4.995 8.745a.75.75 0 0 1 1.06 0L7.25 9.939V4a.75.75 0 0 1 1.5 0v5.94l1.195-1.195a.75.75 0 1 1 1.06 1.06L8 12.811l-.528-.528a.945.945 0 0 1-.005-.005L4.995 9.805a.75.75 0 0 1 0-1.06z"></path><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z"></path></svg>
-                <div>安装应用</div>
-              </button>
-              <div className="pr-2">
-                <button className="w-8 h-8 flex items-center justify-center hover:scale-105">
-                  <div className="w-6 h-6 bg-red-500 rounded-full">
-                  </div>
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={register}
-                className="text-[#A7A7A7] px-4 py-2 font-medium hover:text-white hover:scale-105">
-                Register
-              </button>
-              <div className="pr-4">
-                <button className={"text-black font-medium bg-white h-[48px] py-2 px-8 rounded-full hover:scale-105"}>
-                  Login
-                </button>
-              </div>
-            </>
-          )
-        }
+        <button className="text-white text-sm hover:scale-105 py-1 px-4 flex flex-row items-center space-x-1">
+          <svg data-encore-id="icon" fill="white" width={16} height={16} role="img" aria-hidden="true" viewBox="0 0 16 16"><path d="M4.995 8.745a.75.75 0 0 1 1.06 0L7.25 9.939V4a.75.75 0 0 1 1.5 0v5.94l1.195-1.195a.75.75 0 1 1 1.06 1.06L8 12.811l-.528-.528a.945.945 0 0 1-.005-.005L4.995 9.805a.75.75 0 0 1 0-1.06z"></path><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z"></path></svg>
+          <div>安装应用</div>
+        </button>
+        <div className="pr-2">
+          <Link href={"/account"} prefetch
+            className="w-8 h-8 flex items-center justify-center hover:scale-105">
+            <div className="w-6 h-6 bg-red-500 rounded-full">
+            </div>
+          </Link>
+        </div>
       </div>
     </div>
   )
