@@ -5,7 +5,11 @@ import { useEffect, useRef, useState } from "react";
 import Chats from "./components/Chats";
 import NavigationBar from "./components/NavigationBar";
 import { usePathname } from "next/navigation";
-import Link from 'next/link'
+import Link from 'next/link';
+import { initDB } from "react-indexed-db-hook";
+import { DBConfig } from "@/utils/DBConfig";
+
+initDB(DBConfig);
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -70,8 +74,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className={"flex flex-row h-screen w-screen p-2 space-x-2"}>
-          <div className={"space-y-2 flex flex-col w-[300px] xl:w-[400px]"}>
+        <div className={"flex flex-row h-screen w-screen p-2 space-x-2 min-w-[1080px]"}>
+          <div className={"space-y-2 flex flex-col w-[300px]"}>
             <div className={"bg-[#121212] w-full rounded-lg px-6 py-5 space-y-2"}>
               <div className={"flex flex-row items-center space-x-0.5 pb-1"}>
                 <div className="w-6 h-6 flex items-center justify-center">
@@ -101,7 +105,7 @@ export default function RootLayout({
             </div>
             <Chats />
           </div>
-          <div className={"w-[calc(100%-308px)] xl:w-[calc(100%-408px)] overflow-y-scroll"}>
+          <div className={"w-[calc(100%-308px)] overflow-y-scroll"}>
             <div className={"rounded-lg bg-[#121212] h-full overflow-scroll"} ref={scrollRef}>
               <NavigationBar scrolled={scrolled} />
               <div className="mt-6">

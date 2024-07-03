@@ -29,7 +29,8 @@
     "opentype.js": "^1.3.4",
     "prettier": "^3.3.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-indexed-db-hook": "^1.0.14"
   },
   "devDependencies": {
     "@types/node": "^20",
