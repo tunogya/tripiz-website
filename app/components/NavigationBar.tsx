@@ -1,5 +1,9 @@
 import { usePathname, useRouter } from "next/navigation";
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect, useMemo, useState } from "react";
+import { generateSecretKey, getPublicKey } from 'nostr-tools/pure'
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
+import { useLocalStorage } from "@uidotdev/usehooks";
+import { encodeKey } from "@/utils/nostrUtil";
 
 const NavigationBar: FC<{
   scrolled: boolean
@@ -7,6 +11,20 @@ const NavigationBar: FC<{
   const [text, setText] = useState("");
   const router = useRouter();
   const pathname = usePathname();
+  const [skHex, setSkHex] = useLocalStorage("skHex", "");
+
+  const register = () => {
+    let sk = generateSecretKey() // `sk` is a Uint8Array
+    // let pk = getPublicKey(sk) // `pk` is a hex string
+    let skHex = bytesToHex(sk)
+    // let backToBytes = hexToBytes(skHex)
+    setSkHex(skHex);
+  }
+
+  const nostrPk = useMemo(() => {
+    const sk = hexToBytes(skHex);
+    return encodeKey("npub", getPublicKey(sk).substring(2))
+  }, [skHex]);
 
   useEffect(() => {
     if (!pathname.startsWith("/search")) {
@@ -53,14 +71,23 @@ const NavigationBar: FC<{
         }
       </div>
       <div className="flex flex-row items-center space-x-4">
-        <button className="text-[#A7A7A7] px-4 py-2 font-medium hover:text-white hover:scale-105">
-          Register
-        </button>
-        <button className={"text-black font-medium bg-white h-[48px] py-2 px-8 rounded-full hover:scale-105"}>
-          Login
-        </button>
+        {
+          skHex ? (
+            <div>{nostrPk}</div>
+          ) : (
+            <>
+              <button
+                onClick={register}
+                className="text-[#A7A7A7] px-4 py-2 font-medium hover:text-white hover:scale-105">
+                Register
+              </button>
+              <button className={"text-black font-medium bg-white h-[48px] py-2 px-8 rounded-full hover:scale-105"}>
+                Login
+              </button>
+            </>
+          )
+        }
       </div>
-
     </div>
   )
 }

@@ -1,7 +1,7 @@
 "use client";
 import {useEffect, useState} from "react";
 import Image from "next/image";
-import {encodeKey} from "@/app/lib/nostr";
+import {encodeKey} from "@/utils/nostr";
 
 const UserCard = ({item}: any) => {
   const [picture, setPicture] = useState(undefined);
