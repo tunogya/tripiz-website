@@ -2,6 +2,7 @@ import { hexToBytes } from "@noble/hashes/utils";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { getPublicKey } from "nostr-tools";
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useIndexedDB } from "react-indexed-db-hook";
 
 const WebSocketContext = createContext({
   send: (message: string) => {},
@@ -13,19 +14,16 @@ const WebSocketProvider = ({ children }) => {
   const [connected, setConnected] = useState(false);
   const [queue, setQueue] = useState([]);
   const [skHex, setSkHex] = useLocalStorage("skHex", "");
+  const { add } = useIndexedDB("events");
 
   const pubkey = useMemo(() => {
     const sk = hexToBytes(skHex);
     return getPublicKey(sk);
   }, [skHex]);
 
-  // const pubkey = useLocalStorage("pubkey", generateSecretKey());
   const url = `wss://relay.abandon.ai?pubkey=${pubkey}`;
 
   const handleReconnection = () => {
-    if (connected) {
-      return
-    }
     setTimeout(() => {
       connectWebSocket();
     }, 2_000);
@@ -63,7 +61,7 @@ const WebSocketProvider = ({ children }) => {
       if (data?.[0] === "EVENT") {
         const _e = data[2];
         try {
-          // insert into db
+          add(_e);
         } catch (e) {
           console.log(e);
         }

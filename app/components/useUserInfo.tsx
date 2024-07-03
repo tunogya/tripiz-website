@@ -12,6 +12,9 @@ const useUserInfo = (pubkey: string) => {
 
     useEffect(() => {
         const query = async () => {
+            if (!pubkey) {
+                return 
+            }
             openCursor((evt) => {
                 // @ts-ignore
                 var cursor = evt.target.result;
@@ -22,7 +25,7 @@ const useUserInfo = (pubkey: string) => {
                     }
                     cursor.continue();
                 }
-            })
+            });
         }
         query();
     }, []);
@@ -39,6 +42,9 @@ const useUserInfo = (pubkey: string) => {
     }, [event]);
 
     useEffect(() => {
+        if (!pubkey) {
+            return
+        }
         send(JSON.stringify([
             "REQ",
             uuidv4(),
