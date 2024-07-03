@@ -1,10 +1,12 @@
 'use client';
 import { usePathname, useRouter } from "next/navigation";
-import { FC, useEffect, useState } from "react";
-import { generateSecretKey } from 'nostr-tools/pure'
-import { bytesToHex } from "@noble/hashes/utils";
+import { FC, useEffect, useMemo, useState } from "react";
+import { generateSecretKey, getPublicKey } from 'nostr-tools/pure'
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import Link from "next/link";
+import useUserInfo from "./useUserInfo";
+import Image from "next/image";
 
 const NavigationBar: FC<{
   scrolled: boolean
@@ -13,6 +15,16 @@ const NavigationBar: FC<{
   const router = useRouter();
   const pathname = usePathname();
   const [skHex, setSkHex] = useLocalStorage("skHex", "");
+
+  const pubkey = useMemo(() => {
+    if (!skHex) {
+      return "";
+    }
+    const sk = hexToBytes(skHex);
+    return getPublicKey(sk);
+  }, [skHex]);
+
+  const { picture } = useUserInfo(pubkey);
 
   const register = () => {
     let sk = generateSecretKey() // `sk` is a Uint8Array
@@ -86,8 +98,14 @@ const NavigationBar: FC<{
         <div className="pr-2">
           <Link href={"/account"} prefetch
             className="w-8 h-8 flex items-center justify-center hover:scale-105">
-            <div className="w-6 h-6 bg-red-500 rounded-full">
-            </div>
+            {
+              picture ? (
+                <Image src={picture} alt={""} width={24} height={24} className="rounded-full"/>
+              ) : (
+                <div className="w-6 h-6 bg-red-500 rounded-full">
+                </div>
+              )
+            }
           </Link>
         </div>
       </div>
