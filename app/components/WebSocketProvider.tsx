@@ -17,6 +17,9 @@ const WebSocketProvider = ({ children }) => {
   const { add } = useIndexedDB("events");
 
   const pubkey = useMemo(() => {
+    if (!skHex) {
+      return null;
+    }
     const sk = hexToBytes(skHex);
     return getPublicKey(sk);
   }, [skHex]);
