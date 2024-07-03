@@ -1,12 +1,10 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { useWebSocket } from "./WebSocketProvider";
 import { v4 as uuidv4 } from 'uuid';
 import { useIndexedDB } from "react-indexed-db-hook";
 
 const useUserInfo = (pubkey: string) => {
-    const { send } = useWebSocket();
     const { openCursor, deleteRecord } = useIndexedDB("events");
     const [event, setEvent] = useState<any>(undefined);
     const [name, setName] = useState("Anonymous");
@@ -64,20 +62,20 @@ const useUserInfo = (pubkey: string) => {
         }
     }, [event]);
 
-    useEffect(() => {
-        if (!pubkey) {
-            return
-        }
-        send(JSON.stringify([
-            "REQ",
-            uuidv4(),
-            {
-                authors: [pubkey],
-                kinds: [0],
-                limit: 1,
-            },
-        ]))
-    }, [pubkey]);
+    // useEffect(() => {
+    //     if (!pubkey) {
+    //         return
+    //     }
+    //     send(JSON.stringify([
+    //         "REQ",
+    //         uuidv4(),
+    //         {
+    //             authors: [pubkey],
+    //             kinds: [0],
+    //             limit: 1,
+    //         },
+    //     ]))
+    // }, [pubkey]);
 
     return {
         name,
