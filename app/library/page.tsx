@@ -14,6 +14,7 @@ const Page = () => {
   const { send } = useWebSocket();
   const [filter, setFilter] = useState("");
   const [DATA, setDATA] = useState<any[]>([]);
+  const [queried, setQueried] = useState(false);
 
   const pubkey = useMemo(() => {
     const sk = hexToBytes(skHex);
@@ -21,6 +22,7 @@ const Page = () => {
   }, [skHex]);
 
   useEffect(() => {
+    setQueried(false);
     const query = async () => {
       let result: any[] = [];
       const openCursorAsync = () => {
@@ -45,6 +47,7 @@ const Page = () => {
       // 将results排序，created_at 降序
       result = result.sort((a, b) => b.created_at - a.created_at);
       setDATA(result);
+      setQueried(true);
     }
     query();
   }, []);
@@ -62,17 +65,21 @@ const Page = () => {
     }
   }, [DATA, filter]);
 
-  // useEffect(() => {
-  //   send(JSON.stringify([
-  //     "REQ",
-  //     uuidv4(),
-  //     {
-  //       authors: [pubkey],
-  //       kinds: [1],
-  //       limit: 20,
-  //     },
-  //   ]));
-  // }, [pubkey]);
+  useEffect(() => {
+    if (!queried) {
+      return;
+    }
+    send(JSON.stringify([
+      "REQ",
+      uuidv4(),
+      {
+        authors: [pubkey],
+        kinds: [1],
+        since: filterData.length > 0 ? filterData[0].created_at : 0,
+        limit: 40,
+      },
+    ]));
+  }, [pubkey, filterData, queried]);
 
   return (
     <div className="px-6">
@@ -121,6 +128,7 @@ const Page = () => {
           ))
         }
       </div>
+      <div className="h-80"></div>
     </div>
   )
 }
