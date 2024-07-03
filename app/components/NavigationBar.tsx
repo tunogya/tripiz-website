@@ -6,7 +6,7 @@ import { generateSecretKey, getPublicKey } from 'nostr-tools/pure'
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import Link from "next/link";
-import useUserInfo from "./useUserInfo";
+// import useUserInfo from "./useUserInfo";
 import Image from "next/image";
 
 const NavigationBar: FC<{
@@ -25,7 +25,7 @@ const NavigationBar: FC<{
     return getPublicKey(sk);
   }, [skHex]);
 
-  const { picture } = useUserInfo(pubkey);
+  // const { picture } = useUserInfo(pubkey);
 
   const register = () => {
     let sk = generateSecretKey() // `sk` is a Uint8Array
@@ -101,14 +101,16 @@ const NavigationBar: FC<{
         <div className="pr-2">
           <Link href={"/account"} prefetch
             className="w-8 h-8 flex items-center justify-center hover:scale-105">
-            {
+            {/* {
               picture ? (
                 <Image src={picture} alt={""} width={24} height={24} className="rounded-full" />
               ) : (
                 <div className="w-6 h-6 bg-red-500 rounded-full">
                 </div>
               )
-            }
+            } */}
+                 <div className="w-6 h-6 bg-red-500 rounded-full">
+                 </div>
           </Link>
         </div>
       </div>

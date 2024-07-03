@@ -5,14 +5,14 @@ import { hexToBytes } from "@noble/hashes/utils";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { getPublicKey } from "nostr-tools";
 import { useEffect, useMemo, useState } from "react";
-import { useWebSocket } from "../components/WebSocketProvider";
+// import { useWebSocket } from "../components/WebSocketProvider";
 import { useIndexedDB } from 'react-indexed-db-hook';
 import PostCard from '../components/PostCard';
 
 const Page = () => {
   const [skHex, setSkHex] = useLocalStorage("skHex", "");
   const { openCursor } = useIndexedDB("events");
-  const { send } = useWebSocket();
+  // const { send } = useWebSocket();
   const [filter, setFilter] = useState("");
   const [DATA, setDATA] = useState<any[]>([]);
   const [queried, setQueried] = useState(false);
@@ -66,21 +66,21 @@ const Page = () => {
     }
   }, [DATA, filter]);
 
-  useEffect(() => {
-    if (!queried) {
-      return;
-    }
-    send(JSON.stringify([
-      "REQ",
-      uuidv4(),
-      {
-        authors: [pubkey],
-        kinds: [1],
-        since: filterData.length > 0 ? filterData[0].created_at : 0,
-        limit: 40,
-      },
-    ]));
-  }, [pubkey, filterData, queried]);
+  // useEffect(() => {
+  //   if (!queried) {
+  //     return;
+  //   }
+  //   send(JSON.stringify([
+  //     "REQ",
+  //     uuidv4(),
+  //     {
+  //       authors: [pubkey],
+  //       kinds: [1],
+  //       since: filterData.length > 0 ? filterData[0].created_at : 0,
+  //       limit: 40,
+  //     },
+  //   ]));
+  // }, [pubkey, filterData, queried]);
 
   return (
     <div className="px-6">
