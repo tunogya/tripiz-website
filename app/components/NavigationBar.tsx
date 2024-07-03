@@ -34,7 +34,7 @@ const NavigationBar: FC<{
 
   return (
     <div
-      className={`sticky top-0 h-[64px] ${scrolled ? "bg-[#121212]" : "bg-[#00000033]"} rounded-t-lg flex flex-row items-center justify-between pl-4 pr-8`}>
+      className={`sticky top-0 h-[64px] ${scrolled ? "bg-[#121212]" : "bg-[#00000033]"} rounded-t-lg flex flex-row items-center justify-between px-4`}>
       <div className="flex flex-row items-center space-x-4">
         <div className="flex flex-row space-x-2">
           <button
@@ -58,22 +58,39 @@ const NavigationBar: FC<{
         </div>
         {
           pathname?.startsWith("/search") && (
-            <input
-              type="text"
-              value={text}
-              onChange={(e) => {
-                setText(e.target.value)
-                router.replace(`/search/${e.target.value}`)
-              }}
-              className="h-[48px] w-[365px] rounded-full bg-[#242424] text-white px-4 outline-none focus:outline-none focus:ring-2 focus:ring-white"
-            />
+            <div
+              className="h-[48px] w-[365px] rounded-full bg-[#242424] text-white px-4 flex items-center space-x-3"
+            >
+              <svg data-encore-id="icon" role="img" aria-hidden="true" width={16} height={16} fill="white" viewBox="0 0 16 16"><path d="M7 1.75a5.25 5.25 0 1 0 0 10.5 5.25 5.25 0 0 0 0-10.5zM.25 7a6.75 6.75 0 1 1 12.096 4.12l3.184 3.185a.75.75 0 1 1-1.06 1.06L11.304 12.2A6.75 6.75 0 0 1 .25 7z"></path></svg>
+              <input
+                className="text-white outline-none bg-transparent h-full w-full"
+                type="text"
+                placeholder="Search..."
+                value={text}
+                onChange={(e) => {
+                  setText(e.target.value)
+                  router.replace(`/search/${e.target.value}`)
+                }}
+              />
+            </div>
           )
         }
       </div>
       <div className="flex flex-row items-center space-x-4">
         {
           skHex ? (
-            <div>{nostrPk}</div>
+            <>
+              <button className="text-white text-sm hover:scale-105 py-1 px-4 flex flex-row items-center space-x-1">
+                <svg data-encore-id="icon" fill="white" width={16} height={16} role="img" aria-hidden="true" viewBox="0 0 16 16"><path d="M4.995 8.745a.75.75 0 0 1 1.06 0L7.25 9.939V4a.75.75 0 0 1 1.5 0v5.94l1.195-1.195a.75.75 0 1 1 1.06 1.06L8 12.811l-.528-.528a.945.945 0 0 1-.005-.005L4.995 9.805a.75.75 0 0 1 0-1.06z"></path><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z"></path></svg>
+                <div>安装应用</div>
+              </button>
+              <div className="pr-2">
+                <button className="w-8 h-8 flex items-center justify-center hover:scale-105">
+                  <div className="w-6 h-6 bg-red-500 rounded-full">
+                  </div>
+                </button>
+              </div>
+            </>
           ) : (
             <>
               <button
@@ -81,9 +98,11 @@ const NavigationBar: FC<{
                 className="text-[#A7A7A7] px-4 py-2 font-medium hover:text-white hover:scale-105">
                 Register
               </button>
-              <button className={"text-black font-medium bg-white h-[48px] py-2 px-8 rounded-full hover:scale-105"}>
-                Login
-              </button>
+              <div className="pr-4">
+                <button className={"text-black font-medium bg-white h-[48px] py-2 px-8 rounded-full hover:scale-105"}>
+                  Login
+                </button>
+              </div>
             </>
           )
         }
