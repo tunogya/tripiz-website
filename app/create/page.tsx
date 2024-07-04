@@ -26,7 +26,7 @@ const Page = () => {
       );
       db.events.put(event);
       send(JSON.stringify([
-        "Event",
+        "EVENT",
         event,
       ]));
     } catch (e) {
