@@ -41,6 +41,13 @@ const useAccount = () => {
     return encodeKey("nsec", skHex);
   }, [skHex]);
 
+  const refresh = () => {
+    const sk = window.localStorage.getItem("skHex");
+    if (sk) {
+      setSkHex(sk);
+    }
+  }
+
   useEffect(() => {
     const sk = window.localStorage.getItem("skHex");
     if (sk) {
@@ -55,6 +62,7 @@ const useAccount = () => {
     pubkey,
     nostrPk,
     nostrSk,
+    refresh,
   }
 }
 

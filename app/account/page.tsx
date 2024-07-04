@@ -6,7 +6,7 @@ import QRCode from "react-qr-code";
 import useAccount from "../components/useAccount";
 
 const Page = () => {
-  const { nostrPk, nostrSk } = useAccount();
+  const { nostrPk, nostrSk, refresh} = useAccount();
   const [input, setInput] = useState("");
   const [showInput, setShowInput] = useState(false);
 
@@ -73,6 +73,7 @@ const Page = () => {
                       window.localStorage.setItem("skHex", nostrPrivateKey);
                       setShowInput(false);
                       setInput("");
+                      refresh();
                     }}
                     className="bg-[#1ED760] py-3 px-6 rounded-full text-black font-medium disabled:bg-[#B3B3B3]">
                     Import
