@@ -1,38 +1,14 @@
 'use client';
 
-import { decodeKey, encodeKey } from "@/utils/nostrUtil";
-import { hexToBytes } from "@noble/hashes/utils";
-import { getPublicKey } from "nostr-tools";
-import { useEffect, useMemo, useState } from "react";
+import { decodeKey } from "@/utils/nostrUtil";
+import { useState } from "react";
 import QRCode from "react-qr-code";
+import useAccount from "../components/useAccount";
 
 const Page = () => {
-  const [skHex, setSkHex] = useState("");
+  const { nostrPk, nostrSk } = useAccount();
   const [input, setInput] = useState("");
   const [showInput, setShowInput] = useState(false);
-
-  useEffect(() => {
-    const sk = window.localStorage.getItem("skHex");
-    if (sk) {
-      setSkHex(sk);
-    }
-  }, []);
-
-  const nostrPk = useMemo(() => {
-    if (!skHex) {
-      return null;
-    }
-    const sk = hexToBytes(skHex);
-    const pubkey = getPublicKey(sk);
-    return encodeKey("npub", pubkey);
-  }, [skHex]);
-
-  const nostrSk = useMemo(() => {
-    if (!skHex) {
-      return null;
-    }
-    return encodeKey("nsec", skHex);
-  }, [skHex]);
 
   return (
     <div className="px-6">

@@ -1,10 +1,9 @@
 'use client';
 
 import { usePathname, useRouter } from "next/navigation";
-import { FC, useEffect, useMemo, useState } from "react";
-import { generateSecretKey, getPublicKey } from 'nostr-tools/pure'
-import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
+import { FC, useEffect, useState } from "react";
 import Link from "next/link";
+import useAccount from "./useAccount";
 
 const NavigationBar: FC<{
   scrolled: boolean
@@ -12,35 +11,9 @@ const NavigationBar: FC<{
   const [text, setText] = useState("");
   const router = useRouter();
   const pathname = usePathname();
-  const [skHex, setSkHex] = useState("");
-
-  useEffect(() => {
-    const sk = window.localStorage.getItem("skHex");
-    if (sk) {
-      setSkHex(sk);
-    } else {
-      register();
-    }
-  }, []);
-
-  const pubkey = useMemo(() => {
-    if (!skHex) {
-      return "";
-    }
-    const sk = hexToBytes(skHex);
-    return getPublicKey(sk);
-  }, [skHex]);
+  const { skHex } = useAccount();
 
   // const { picture } = useUserInfo(pubkey);
-
-  const register = () => {
-    let sk = generateSecretKey() // `sk` is a Uint8Array
-    // let pk = getPublicKey(sk) // `pk` is a hex string
-    let skHex = bytesToHex(sk)
-    // let backToBytes = hexToBytes(skHex)
-    setSkHex(skHex);
-    window.localStorage.setItem("skHex", skHex);
-  }
 
   useEffect(() => {
     if (!pathname.startsWith("/search")) {
