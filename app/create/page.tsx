@@ -65,7 +65,7 @@ const Page = () => {
           className="w-full p-3 bg-[#FFFFFF12] rounded-xl outline-none resize-none"
         />
       </div>
-      <div className="flex flex-row mt-3 items-center justify-end">
+      <div className="flex flex-row mt-6 items-center justify-end">
         <button
           onClick={() => {
             post();
