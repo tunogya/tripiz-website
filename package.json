@@ -32,6 +32,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-qr-code": "^2.0.15",
+    "swr": "^2.2.5",
     "uuid": "^10.0.0"
   },
   "devDependencies": {

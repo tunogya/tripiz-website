@@ -44,7 +44,7 @@ const Page = () => {
         {
           list.map((item, index) => (
             <Link
-              href={`/class/${item.class.toLowerCase()}`} prefetch
+              href={`/class/${item.class}`} prefetch
               style={{
                 background: item.color
               }}

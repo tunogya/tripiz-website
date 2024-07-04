@@ -1,10 +1,15 @@
+'use client';
+
 import { db } from "@/utils/db.model";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useState } from "react";
+import { useWebSocket } from "./WebSocketProvider";
+import { v4 as uuidv4 } from 'uuid';
 
 const useProfile = (pubkey: string) => {
   const [name, setName] = useState("Anonymous");
   const [picture, setPicture] = useState("");
+  const { send } = useWebSocket();
 
   const result = useLiveQuery(() => db.events
     .where("pubkey")
@@ -23,6 +28,16 @@ const useProfile = (pubkey: string) => {
       } catch(e) {
         console.log(e);
       }
+    } else {
+      send(JSON.stringify([
+        "REQ",
+        uuidv4(),
+        {
+          kinds: [0],
+          authors: [pubkey],
+          limit: 1,
+        }
+      ]));
     }
   }, [result]);
 
