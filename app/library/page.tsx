@@ -10,7 +10,7 @@ import Link from "next/link";
 const Page = () => {
   const { pubkey } = useAccount();
   const [filter, setFilter] = useState("");
-  
+
   const data = useLiveQuery(() => db.events
     .where("kind")
     .equals(1)
@@ -81,6 +81,11 @@ const Page = () => {
           data && data.map((item) => (
             <PostCard event={item} key={item.id} />
           ))
+        }
+        {
+          data && data?.length === 0 && (
+            <div>404</div>
+          )
         }
       </div>
       <div className="h-80"></div>
