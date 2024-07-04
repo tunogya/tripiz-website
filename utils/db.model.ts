@@ -2,7 +2,7 @@ import Dexie, { Table } from 'dexie';
 
 // table inteface
 export interface Event {
-  id: number;
+  id: string;
   kind: number;
   pubkey: string;
   created_at: number;
