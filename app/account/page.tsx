@@ -21,7 +21,7 @@ const Page = () => {
             Public Key
           </div>
           <div className="text-[#B3B3B3] text-sm">
-            {nostrPk}
+            {nostrPk || "-"}
           </div>
         </div>
         <div>
@@ -29,7 +29,7 @@ const Page = () => {
             Secret Key
           </div>
           <div className="text-[#B3B3B3] text-sm">
-            {nostrSk}
+            {nostrSk || "-"}
           </div>
         </div>
         <div>
