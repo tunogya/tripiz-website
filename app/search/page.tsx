@@ -1,5 +1,7 @@
 'use client';
 
+import Link from "next/link";
+
 const Page = () => {
 
   const list = [
@@ -41,13 +43,14 @@ const Page = () => {
       <div className="grid xl:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4">
         {
           list.map((item, index) => (
-            <div
+            <Link
+              href={`/class/${item.class.toLowerCase()}`} prefetch
               style={{
                 background: item.color
               }}
               className="h-40 rounded-lg p-4 text-white font-medium text-2xl" key={index}>
                 {item.class}
-            </div>
+            </Link>
           ))
         }
         <div className="h-80">
