@@ -13,15 +13,16 @@ const Page = ({ params }: { params: { id: string } }) => {
   );
 
   return (
-    <div>
-      <div className={"text-white text-6xl font-medium px-6 pb-6"}>{params.id}</div>
+    <div className="px-6">
+      <div className={"text-white text-6xl font-medium h-40"}>{params.id}</div>
       <div className="space-y-4">
-      {data &&
+        {isLoading && <div className="text-[#A7A7A7]">Loading...</div>}
+        {data &&
           Object.keys(data)
             .sort((a, b) => a.localeCompare(b))
             .map((item) => (
               <ContentClassItem key={item} category={item} value={data[item]} />
-          ))}
+            ))}
       </div>
       <div className="h-80"></div>
     </div>
