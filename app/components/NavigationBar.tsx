@@ -4,6 +4,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { FC, useEffect, useState } from "react";
 import Link from "next/link";
 import useAccount from "./useAccount";
+import useProfile from "./useProfile";
+import Image from "next/image";
 
 const NavigationBar: FC<{
   scrolled: boolean
@@ -11,9 +13,8 @@ const NavigationBar: FC<{
   const [text, setText] = useState("");
   const router = useRouter();
   const pathname = usePathname();
-  const { skHex } = useAccount();
-
-  // const { picture } = useUserInfo(pubkey);
+  const { pubkey } = useAccount();
+  const { picture }  = useProfile(pubkey);
 
   useEffect(() => {
     if (!pathname.startsWith("/search")) {
@@ -75,16 +76,14 @@ const NavigationBar: FC<{
         <div className="pr-2">
           <Link href={"/account"} prefetch
             className="w-8 h-8 flex items-center justify-center hover:scale-105">
-            {/* {
+            {
               picture ? (
                 <Image src={picture} alt={""} width={24} height={24} className="rounded-full" />
               ) : (
                 <div className="w-6 h-6 bg-red-500 rounded-full">
                 </div>
               )
-            } */}
-                 <div className="w-6 h-6 bg-red-500 rounded-full">
-                 </div>
+            }
           </Link>
         </div>
       </div>
