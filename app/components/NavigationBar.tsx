@@ -12,15 +12,24 @@ const NavigationBar: FC<{
   const [text, setText] = useState("");
   const router = useRouter();
   const pathname = usePathname();
-  // const [skHex, setSkHex] = useLocalStorage("skHex");
+  const [skHex, setSkHex] = useState("");
 
-  // const pubkey = useMemo(() => {
-  //   if (!skHex?.data) {
-  //     return "";
-  //   }
-  //   const sk = hexToBytes(skHex?.data);
-  //   return getPublicKey(sk);
-  // }, [skHex]);
+  useEffect(() => {
+    const sk = window.localStorage.getItem("skHex");
+    if (sk) {
+      setSkHex(sk);
+    } else {
+      register();
+    }
+  }, []);
+
+  const pubkey = useMemo(() => {
+    if (!skHex) {
+      return "";
+    }
+    const sk = hexToBytes(skHex);
+    return getPublicKey(sk);
+  }, [skHex]);
 
   // const { picture } = useUserInfo(pubkey);
 
@@ -29,14 +38,9 @@ const NavigationBar: FC<{
     // let pk = getPublicKey(sk) // `pk` is a hex string
     let skHex = bytesToHex(sk)
     // let backToBytes = hexToBytes(skHex)
-    // setSkHex({data: skHex});
+    setSkHex(skHex);
+    window.localStorage.setItem("skHex", skHex);
   }
-
-  // useEffect(() => {
-  //   if (!skHex?.data) {
-  //     register();
-  //   }
-  // }, [skHex]);
 
   useEffect(() => {
     if (!pathname.startsWith("/search")) {

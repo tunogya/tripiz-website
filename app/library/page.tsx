@@ -6,18 +6,25 @@ import { useEffect, useMemo, useState } from "react";
 import PostCard from '../components/PostCard';
 
 const Page = () => {
-  // const [skHex, setSkHex] = useLocalStorage("skHex");
+  const [skHex, setSkHex] = useState("");
   const [filter, setFilter] = useState("");
   const [DATA, setDATA] = useState<any[]>([]);
   const [queried, setQueried] = useState(false);
 
-  // const pubkey = useMemo(() => {
-  //   if (!skHex?.data) {
-  //     return "";
-  //   }
-  //   const sk = hexToBytes(skHex?.data);
-  //   return getPublicKey(sk);
-  // }, [skHex]);
+  useEffect(() => {
+    const sk = window.localStorage.getItem("skHex");
+    if (sk) {
+      setSkHex(sk);
+    }
+  }, []);
+
+  const pubkey = useMemo(() => {
+    if (!skHex) {
+      return "";
+    }
+    const sk = hexToBytes(skHex);
+    return getPublicKey(sk);
+  }, [skHex]);
 
   const filterData = useMemo(() => {
     if (filter) {
