@@ -1,43 +1,30 @@
 'use client';
 
-import { hexToBytes } from "@noble/hashes/utils";
-import { getPublicKey } from "nostr-tools";
-import { useEffect, useMemo, useState } from "react";
-import PostCard from '../components/PostCard';
+import { useState } from "react";
+import { db } from "@/utils/db.model";
+import useAccount from "../components/useAccount";
+import { useLiveQuery } from "dexie-react-hooks";
+import PostCard from "../components/PostCard";
 
 const Page = () => {
-  const [skHex, setSkHex] = useState("");
+  const { pubkey } = useAccount();
   const [filter, setFilter] = useState("");
-  const [DATA, setDATA] = useState<any[]>([]);
-  const [queried, setQueried] = useState(false);
 
-  useEffect(() => {
-    const sk = window.localStorage.getItem("skHex");
-    if (sk) {
-      setSkHex(sk);
-    }
-  }, []);
+  const data = useLiveQuery(() => db.events
+    .where('pubkey')
+    .equals(pubkey)
+    .and((item) => item.kind === 1)
+    .and((item) => {
+      if (!filter) return true;
+      const category =
+        item?.tags?.find((tag: any[]) => tag?.[0] === "category")?.[1] ||
+        "reflections";
+      return category === filter;
+    })
+    .toArray()
+  );
 
-  const pubkey = useMemo(() => {
-    if (!skHex) {
-      return "";
-    }
-    const sk = hexToBytes(skHex);
-    return getPublicKey(sk);
-  }, [skHex]);
-
-  const filterData = useMemo(() => {
-    if (filter) {
-      return DATA.filter((item) => {
-        const category =
-          item?.tags?.find((tag: any[]) => tag?.[0] === "category")?.[1] ||
-          "reflections";
-        return category === filter;
-      });
-    } else {
-      return DATA;
-    }
-  }, [DATA, filter]);
+  console.log(data);
 
   return (
     <div className="px-6">
@@ -81,7 +68,7 @@ const Page = () => {
       </div>
       <div className="grid xl:grid-cols-6 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4 mt-3">
         {
-          filterData.map((item) => (
+          data && data.map((item) => (
             <PostCard event={item} key={item.id} />
           ))
         }
@@ -91,4 +78,4 @@ const Page = () => {
   )
 }
 
-export default Page
+export default Page;
