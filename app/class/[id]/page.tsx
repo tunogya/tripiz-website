@@ -7,7 +7,7 @@ const Page = ({ params }: { params: { id: string } }) => {
   const { pubkey } = useAccount();
   const { data, isLoading, mutate } = useSWR(
     pubkey
-      ? `http://localhost:3000/api/accounts/${pubkey}/category?key=${params.id.toLowerCase()}`
+      ? `https://tripiz.abandon.ai/api/accounts/${pubkey}/category?key=${params.id.toLowerCase()}`
       : undefined,
     (url) => fetch(url).then((res) => res.json()),
   );

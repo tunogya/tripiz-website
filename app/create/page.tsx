@@ -35,7 +35,7 @@ const Page = () => {
   }
 
   return (
-    <div className="px-6">
+    <div className="px-6 w-[720px]">
       <div className="py-2 text-2xl">
         Create
       </div>
@@ -62,7 +62,7 @@ const Page = () => {
           style={{
             height: "100%"
           }}
-          className="w-full p-3 bg-[#FFFFFF12] rounded-xl outline-none"
+          className="w-full p-3 bg-[#FFFFFF12] rounded-xl outline-none resize-none"
         />
       </div>
       <div className="flex flex-row mt-3 items-center justify-end">
