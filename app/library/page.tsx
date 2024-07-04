@@ -11,9 +11,9 @@ const Page = () => {
   const [filter, setFilter] = useState("");
 
   const data = useLiveQuery(() => db.events
-    .where('pubkey')
-    .equals(pubkey)
-    .and((item) => item.kind === 1)
+    .where("kind")
+    .equals(1)
+    .and((item) => item.pubkey === pubkey)
     .and((item) => {
       if (!filter) return true;
       const category =
@@ -22,9 +22,7 @@ const Page = () => {
       return category === filter;
     })
     .toArray()
-  );
-
-  console.log(data);
+  , [filter, pubkey]);
 
   return (
     <div className="px-6">
