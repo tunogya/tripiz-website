@@ -1,20 +1,18 @@
 'use client';
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { useIndexedDB } from "react-indexed-db-hook";
 import useAccount from "./useAccount";
+import { db } from "@/utils/db.model";
 
 const WebSocketContext = createContext({
-  send: (message: string) => {},
+  send: (message: string) => { },
 });
 
 // @ts-ignore
 const WebSocketProvider = ({ children }) => {
   const ws = useRef(null);
   const [connected, setConnected] = useState(false);
-  const [queue, setQueue] = useState([]);
   const { pubkey } = useAccount();
-  const { add } = useIndexedDB("events");
 
   const url = `wss://relay.abandon.ai?pubkey=${pubkey}`;
 
@@ -51,12 +49,12 @@ const WebSocketProvider = ({ children }) => {
     };
 
     // @ts-ignore
-    ws.current.onmessage = (e) => {
+    ws.current.onmessage = async (e) => {
       const data = JSON.parse(e.data);
       if (data?.[0] === "EVENT") {
         const _e = data[2];
         try {
-          add(_e);
+          await db.events.add(_e);
         } catch (e) {
           console.log(e);
         }
@@ -71,26 +69,10 @@ const WebSocketProvider = ({ children }) => {
         ws.current.send(message);
       } catch (e) {
         // @ts-ignore
-        setQueue([...queue, message]);
+        console.log(e)
       }
-    } else {
-      // @ts-ignore
-      setQueue([...queue, message]);
     }
   };
-
-  useEffect(() => {
-    if (queue.length > 0 && connected) {
-      const e = queue[0];
-      try {
-        // @ts-ignore
-        ws.current.send(e);
-        setQueue((prevQueue) => prevQueue.slice(1)); // Remove the sent message
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  }, [queue, connected]);
 
   useEffect(() => {
     if (pubkey) {
