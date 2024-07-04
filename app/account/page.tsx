@@ -70,7 +70,7 @@ const Page = () => {
                       if (!nostrPrivateKey) {
                         return;
                       }
-                      setSkHex(nostrPrivateKey);
+                      window.localStorage.setItem("skHex", nostrPrivateKey);
                       setShowInput(false);
                       setInput("");
                     }}
