@@ -58,6 +58,8 @@ const Page = () => {
       </div>
       <div className="mt-3 h-[400px]">
         <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           placeholder="What's on your mind?"
           style={{
             height: "100%"
@@ -67,6 +69,7 @@ const Page = () => {
       </div>
       <div className="flex flex-row mt-6 items-center justify-end">
         <button
+          disabled={!text}
           onClick={() => {
             post();
             router.push("/library");
