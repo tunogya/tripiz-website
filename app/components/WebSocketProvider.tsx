@@ -54,7 +54,7 @@ const WebSocketProvider = ({ children }) => {
       if (data?.[0] === "EVENT") {
         const _e = data[2];
         try {
-          await db.events.add(_e);
+          await db.events.put(_e);
         } catch (e) {
           console.log(e);
         }
